@@ -1,12 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import {
-  Logout,
-  StaticWebAuthLogins,
-  ClientPrincipal,
-  ClientPrincipalContextProvider,
-  useClientPrincipal,
-} from "@aaronpowell/react-static-web-apps-auth";
+import { ClientPrincipalContextProvider } from "@aaronpowell/react-static-web-apps-auth";
 
 import logo from "./logo.svg";
 import "./App.css";
