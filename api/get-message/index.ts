@@ -22,7 +22,7 @@ const httpTrigger: AzureFunction = async function (
       userInfo.identityProvider
     }. Your user id is ${userInfo.userId}. Details: ${
       userInfo.userDetails
-    }. JSON: ${JSON.stringify(userInfo)}`;
+    }. JSON: ${JSON.stringify(req.headers)}`;
     responseMessage = responseMessage + " " + additionalResponseMessage;
   } else {
     responseMessage = responseMessage + " Not authenticated";
