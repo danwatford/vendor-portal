@@ -1,15 +1,19 @@
 // import {
 //   useClientPrincipal,
 // } from "@aaronpowell/react-static-web-apps-auth";
-import ProfileCaptureHOC from "./ProfileCaptureHOC";
+// import ProfileCaptureHOC from "./ProfileCaptureHOC";
 import Footer from "./Footer";
 import Header from "./Header";
 import Welcome from "./Welcome";
+import {
+  Logout,
+  useClientPrincipal,
+} from "@aaronpowell/react-static-web-apps-auth";
 // import { useUserProfile } from "./UserProfileContext";
 
 const Layout: React.FC = () => {
-  // const { loaded: clientPrincipalLoaded, clientPrincipal } =
-  //   useClientPrincipal();
+  const { loaded: clientPrincipalLoaded, clientPrincipal } =
+    useClientPrincipal();
   // const { loaded: userProfileLoaded, userProfile } = useUserProfile();
 
   // const [loaded, setLoaded] = useState(false);
@@ -18,25 +22,23 @@ const Layout: React.FC = () => {
   //   setLoaded(clientPrincipalLoaded && userProfileLoaded);
   // }, [clientPrincipalLoaded, userProfileLoaded]);
 
-  // let content;
+  let content;
 
-  // if (!clientPrincipalLoaded) {
-  //   content = <p>Loading app...</p>;
-  // } else {
-  //   if (clientPrincipal) {
-  //     content = (
-  //       <>
-  //         <p>
-  //           User logged in:
-  //           {JSON.stringify(clientPrincipal)}
-  //         </p>
-  //         <Logout />
-  //       </>
-  //     );
-  //   } else {
-  //     content = <NewUserLanding />;
-  //   }
-  // }
+  if (!clientPrincipalLoaded) {
+    content = <p>Loading app...</p>;
+  } else {
+    if (clientPrincipal) {
+      content = (
+        <>
+          <p>
+            User logged in:
+            {JSON.stringify(clientPrincipal)}
+          </p>
+          <Logout />
+        </>
+      );
+    }
+  }
 
   return (
     <div className="h-screen flex flex-col gap-1">
@@ -44,9 +46,10 @@ const Layout: React.FC = () => {
         <Header />
       </div>
       <div className="flex-grow">
-        <ProfileCaptureHOC>
-          <Welcome />
-        </ProfileCaptureHOC>
+        {/* <ProfileCaptureHOC> */}
+        <Welcome />
+        {content}
+        {/* </ProfileCaptureHOC> */}
       </div>
       <div>
         <Footer></Footer>

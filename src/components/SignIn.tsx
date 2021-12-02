@@ -8,6 +8,7 @@ const SignIn: React.FC = () => {
         <DefaultButton text="Office 365" href="/.auth/login/aad" />
         <DefaultButton text="Twitter" href="/.auth/login/twitter" />
         <DefaultButton text="Facebook" href="/.auth/login/facebook" />
+        <DefaultButton text="B2C" href="/.auth/login/b2cauth" />
       </div>
     </>
   );
