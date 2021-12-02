@@ -9,11 +9,20 @@ import {
   Logout,
   useClientPrincipal,
 } from "@aaronpowell/react-static-web-apps-auth";
+import { useEffect, useState } from "react";
 // import { useUserProfile } from "./UserProfileContext";
 
 const Layout: React.FC = () => {
   const { loaded: clientPrincipalLoaded, clientPrincipal } =
     useClientPrincipal();
+
+  const [message, setMessage] = useState("");
+  useEffect(() => {
+    fetch("/api/get-message?name=Static Web Apps")
+      .then((res) => res.text())
+      .then((data) => setMessage(data));
+  }, [clientPrincipalLoaded]);
+
   // const { loaded: userProfileLoaded, userProfile } = useUserProfile();
 
   // const [loaded, setLoaded] = useState(false);
@@ -33,6 +42,7 @@ const Layout: React.FC = () => {
           <p>
             User logged in:
             {JSON.stringify(clientPrincipal)}
+            {message && <p>{message}</p>}
           </p>
           <Logout />
         </>
