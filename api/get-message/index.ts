@@ -18,7 +18,11 @@ const httpTrigger: AzureFunction = async function (
   if (isAuthenticated(req)) {
     const userInfo = getUserInfo(req);
 
-    const additionalResponseMessage = `You have signed in with ${userInfo.identityProvider}. Your user id is ${userInfo.userId}. Details: ${userInfo.userDetails}. `;
+    const additionalResponseMessage = `You have signed in with ${
+      userInfo.identityProvider
+    }. Your user id is ${userInfo.userId}. Details: ${
+      userInfo.userDetails
+    }. ${JSON.stringify(req.headers)} `;
     responseMessage = responseMessage + " " + additionalResponseMessage;
   } else {
     responseMessage = responseMessage + " Not authenticated";
