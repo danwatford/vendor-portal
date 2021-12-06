@@ -1,3 +1,4 @@
+import { URL } from "url";
 import { Context } from "@azure/functions";
 import * as msal from "@azure/msal-node";
 
@@ -44,7 +45,10 @@ export const getConfidentialClientConfig = (context: Context) => {
       authority: b2cPolicies.authorities.signUpSignIn.authority,
       clientSecret: process.env.B2C_CLIENT_SECRET,
       knownAuthorities: [b2cPolicies.authorityDomain],
-      redirectUri: process.env.REDIRECT_URI,
+      redirectUri: new URL(
+        "./redirect",
+        context.bindingData.headers["x-ms-original-url"]
+      ).href,
     },
     system: {
       loggerOptions: {
