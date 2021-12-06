@@ -7,9 +7,8 @@ const httpTrigger: AzureFunction = async function (
 ): Promise<void> {
   const user = await getUserFromCookie(req.headers.cookie);
 
-  context.res = {
-    body: user,
-  };
+  context.res.body = user;
+  context.res.type("application/json");
 };
 
 export default httpTrigger;
