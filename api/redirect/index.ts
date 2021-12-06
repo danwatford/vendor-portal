@@ -23,7 +23,7 @@ const httpTrigger: AzureFunction = async function (
     // prepare the request for authentication
     const tokenRequest: AuthorizationCodeRequest = {
       scopes: ["openid", "offline_access"],
-      code: req.query.code,
+      code: req.query.authcode,
       redirectUri: confidentialClientConfig.auth.redirectUri,
     };
 
