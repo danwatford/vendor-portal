@@ -2,14 +2,22 @@ import Footer from "./Footer";
 import Header from "./Header";
 import Welcome from "./Welcome";
 import { useUserProfile } from "../services/UserProfileContext";
+import { useState } from "react";
+import Spinner from "./Spinner";
+
+type Screen =
+  | "home"
+  | "create-craft-application"
+  | "create-catering-application";
 
 const Layout: React.FC = () => {
+  const [screen, setScreen] = useState<Screen>("home");
   const { loaded, userProfile } = useUserProfile();
 
   let content;
 
   if (!loaded) {
-    content = <p>Loading app...</p>;
+    content = <Spinner />;
   } else {
     if (userProfile) {
       content = (
@@ -29,7 +37,7 @@ const Layout: React.FC = () => {
         <Header />
       </div>
       <div className="flex-grow">
-        <Welcome />
+        {/* <Welcome /> */}
         {content}
       </div>
       <div>

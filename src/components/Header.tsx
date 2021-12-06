@@ -21,7 +21,9 @@ const Header: React.FC = () => {
       );
     }
   } else {
-    authPanel = <p className="text-bfw-link">Checking authentication...</p>;
+    authPanel = (
+      <p className="text-bfw-link animate-pulse">Checking authentication...</p>
+    );
   }
 
   return (
