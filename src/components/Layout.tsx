@@ -5,10 +5,6 @@
 import Footer from "./Footer";
 import Header from "./Header";
 import Welcome from "./Welcome";
-import {
-  Logout,
-  useClientPrincipal,
-} from "@aaronpowell/react-static-web-apps-auth";
 import { useEffect, useState } from "react";
 import { useUserProfile } from "../services/UserProfileContext";
 // import { useUserProfile } from "./UserProfileContext";
@@ -36,7 +32,6 @@ const Layout: React.FC = () => {
             User logged in:
             {JSON.stringify(userProfile)}
           </p>
-          <Logout />
         </>
       );
     }
