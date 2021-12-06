@@ -1,17 +1,15 @@
-import {
-  Logout,
-  useClientPrincipal,
-} from "@aaronpowell/react-static-web-apps-auth";
+import { useUserProfile } from "../services/UserProfileContext";
+import Logout from "./Logout";
 import styles from "./Header.module.scss";
 import SignIn from "./SignIn";
 
 const Header: React.FC = () => {
-  const { loaded, clientPrincipal } = useClientPrincipal();
+  const { loaded, userProfile } = useUserProfile();
 
   let authPanel = null;
 
   if (loaded) {
-    if (clientPrincipal) {
+    if (userProfile) {
       authPanel = <Logout />;
     } else {
       authPanel = <SignIn />;

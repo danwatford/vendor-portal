@@ -1,26 +1,15 @@
 import React from "react";
 
-import { ClientPrincipalContextProvider } from "@aaronpowell/react-static-web-apps-auth";
-
 import "./App.css";
 import Layout from "./components/Layout";
+import { UserProfileContextProvider } from "./services/UserProfileContext";
 
 function App() {
-  // const [message, setMessage] = useState("");
-  // useEffect(() => {
-  //   fetch("/api/get-message?name=Static Web Apps")
-  //     .then((res) => res.text())
-  //     .then((data) => setMessage(data));
-  // }, []);
   return (
     <div className="App">
-      <ClientPrincipalContextProvider>
-        <>
-          <Layout />
-
-          {/* {message && <p>{message}</p>} */}
-        </>
-      </ClientPrincipalContextProvider>
+      <UserProfileContextProvider>
+        <Layout />
+      </UserProfileContextProvider>
     </div>
   );
 }

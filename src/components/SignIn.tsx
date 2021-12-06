@@ -3,12 +3,9 @@ import { DefaultButton } from "@fluentui/react";
 const SignIn: React.FC = () => {
   return (
     <>
-      <h2>Sign in using your account from one of these services</h2>
+      <h2>Sign in or create an account</h2>
       <div>
-        <DefaultButton text="Office 365" href="/.auth/login/aad" />
-        <DefaultButton text="Twitter" href="/.auth/login/twitter" />
-        <DefaultButton text="Facebook" href="/.auth/login/facebook" />
-        <DefaultButton text="B2C" href="/.auth/login/b2cauth" />
+        <DefaultButton text="Sign In" href="/api/login" />
       </div>
     </>
   );
