@@ -15,8 +15,11 @@ const httpTrigger: AzureFunction = async function (
   const confidentialClientConfig = getConfidentialClientConfig(context);
   const cca = getConfidentialClientApplication(context);
 
+  context.log("In redirect. Checking query state: " + req.query.state);
+
   // determine where the request comes from
   if (req.query.state === APP_STATES.LOGIN) {
+    context.log("In LOGIN state");
     // prepare the request for authentication
     const tokenRequest: AuthorizationCodeRequest = {
       scopes: ["openid", "offline_access"],
@@ -24,7 +27,9 @@ const httpTrigger: AzureFunction = async function (
       redirectUri: confidentialClientConfig.auth.redirectUri,
     };
 
+    context.log("About to request ID token by code");
     const tokenResponse = await cca.acquireTokenByCode(tokenRequest);
+    context.log("Got token response: " + JSON.stringify(tokenResponse));
     const idClaims = tokenResponse.idTokenClaims;
     const user: User = {
       userId: idClaims["sub"],
@@ -36,7 +41,9 @@ const httpTrigger: AzureFunction = async function (
       dbId: null,
     };
 
+    context.log("About to create or update user: " + JSON.stringify(user));
     const persistedUser = await createOrUpdateUser(user);
+    context.log("User saved. ID is " + persistedUser.dbId);
 
     const userCookie = createUserCookie(persistedUser.userId, persistedUser);
 
