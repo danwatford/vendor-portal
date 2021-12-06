@@ -1,8 +1,8 @@
 import Footer from "./Footer";
 import Header from "./Header";
-// import Welcome from "./Welcome";
+import Welcome from "./Welcome";
 import { useUserProfile } from "../services/UserProfileContext";
-// import { useState } from "react";
+import { useCallback, useState } from "react";
 import Spinner from "./Spinner";
 
 type Screen =
@@ -11,23 +11,40 @@ type Screen =
   | "create-catering-application";
 
 const Layout: React.FC = () => {
-  // const [screen, setScreen] = useState<Screen>("home");
+  const [screen, setScreen] = useState<Screen>("home");
   const { loaded, userProfile } = useUserProfile();
 
-  let content;
+  const onCreateCraftApplicationClicked = useCallback(() => {
+    setScreen("create-craft-application");
+  }, []);
 
+  const onCreateCateringApplicationClicked = useCallback(() => {
+    setScreen("create-catering-application");
+  }, []);
+
+  let content;
   if (!loaded) {
     content = <Spinner />;
   } else {
-    if (userProfile) {
-      content = (
-        <>
-          <p>
-            User logged in:
-            {JSON.stringify(userProfile)}
-          </p>
-        </>
-      );
+    if (!userProfile) {
+      switch (screen) {
+        case "home":
+          content = (
+            <Welcome
+              createCraftApplicationClickedHandler={
+                onCreateCraftApplicationClicked
+              }
+              createCateringApplicationClickedHandler={
+                onCreateCateringApplicationClicked
+              }
+            />
+          );
+          break;
+        case "create-craft-application":
+          break;
+        case "create-catering-application":
+          break;
+      }
     }
   }
 
@@ -36,10 +53,7 @@ const Layout: React.FC = () => {
       <div>
         <Header />
       </div>
-      <div className="flex-grow">
-        {/* <Welcome /> */}
-        {content}
-      </div>
+      <div className="flex-grow">{content}</div>
       <div>
         <Footer></Footer>
       </div>
