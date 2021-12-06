@@ -39,17 +39,14 @@ export const b2cPolicies = {
 };
 
 export const getConfidentialClientConfig = (context: Context) => {
-  context.log(
-    "Getting confidential client. Headers are:",
-    context.bindingData.headers
-  );
+  context.log("Getting confidential client. Request is:", context.req);
   return {
     auth: {
       clientId: process.env.B2C_CLIENT_ID,
       authority: b2cPolicies.authorities.signUpSignIn.authority,
       clientSecret: process.env.B2C_CLIENT_SECRET,
       knownAuthorities: [b2cPolicies.authorityDomain],
-      redirectUri: new URL("redirect", context.req.url).href,
+      redirectUri: new URL("redirect", context.req["originalUrl"]).href,
     },
     system: {
       loggerOptions: {
