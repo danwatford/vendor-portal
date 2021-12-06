@@ -13,7 +13,7 @@ const httpTrigger: AzureFunction = async function (
     context.res = {
       status: 302,
       headers: {
-        Location: process.env.WEBAPP_URI,
+        Location: "..",
       },
     };
   } else {
