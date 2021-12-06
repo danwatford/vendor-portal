@@ -46,7 +46,8 @@ export const getConfidentialClientConfig = (context: Context) => {
       authority: b2cPolicies.authorities.signUpSignIn.authority,
       clientSecret: process.env.B2C_CLIENT_SECRET,
       knownAuthorities: [b2cPolicies.authorityDomain],
-      redirectUri: new URL("redirect", context.req["originalUrl"]).href,
+      redirectUri: new URL("redirect", context.req.headers["x-ms-original-url"])
+        .href,
     },
     system: {
       loggerOptions: {
