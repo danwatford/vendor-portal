@@ -10,7 +10,7 @@ const Welcome: React.FC<WelcomeProps> = ({
   createCateringApplicationClickedHandler,
 }) => {
   return (
-    <div>
+    <div className="m-auto max-w-4xl">
       <div className="px-2 space-y-2 text-left">
         <h1 className="text-2xl text-center">
           Welcome to the Broadstairs Folk Week Vendor Portal

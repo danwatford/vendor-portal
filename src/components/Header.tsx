@@ -27,8 +27,8 @@ const Header: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col bg-bfw-yellow">
-      <div className="flex flex-col p-1 bg-black text-right">
+    <div className="flex flex-col sm:grid sm:grid-cols-2 bg-bfw-yellow">
+      <div className="sm:col-span-2 p-1 bg-black text-right">
         <div className={styles.AuthPanel}>{authPanel}</div>
       </div>
       <div className="mx-4 my-1 h-32 bg-header-logo bg-contain bg-no-repeat bg-center"></div>
