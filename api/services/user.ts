@@ -13,7 +13,7 @@ const MAX_COOKIE_AGE_SECONDS = 60 * 60 * 12;
 export const createExpiredUserCookie = (): Cookie => {
   return {
     name: "vendorPortalUser",
-    value: null,
+    value: "NA",
     secure: true,
     httpOnly: true,
     sameSite: "Strict",
