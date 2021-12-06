@@ -48,6 +48,8 @@ export const getConfidentialClientConfig = (context: Context) => {
       knownAuthorities: [b2cPolicies.authorityDomain],
       redirectUri: new URL("redirect", context.req.headers["x-ms-original-url"])
         .href,
+      logoutRedirectUri: new URL("/", context.req.headers["x-ms-original-url"])
+        .href,
     },
     system: {
       loggerOptions: {
@@ -91,6 +93,18 @@ export const getAuthCodeLocation = async (
 
   // request an authorization code to exchange for a token
   return cca.getAuthCodeUrl(authCodeRequest);
+};
+
+export const getLogoutLocation = (context: Context, authority: string) => {
+  const confidentialClientConfig = getConfidentialClientConfig(context);
+
+  const logoutUrl = new URL(authority + "/oauth2/v2.0/logout");
+  logoutUrl.searchParams.append(
+    "redirect_uri",
+    confidentialClientConfig.auth.logoutRedirectUri
+  );
+
+  return logoutUrl.href;
 };
 
 export const getConfidentialClientApplication = (context: Context) => {

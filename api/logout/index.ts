@@ -1,4 +1,5 @@
 import { AzureFunction, Context, Cookie, HttpRequest } from "@azure/functions";
+import { b2cPolicies, getLogoutLocation } from "../common/auth";
 import { createExpiredUserCookie } from "../services/user";
 
 const httpTrigger: AzureFunction = async function (
@@ -13,7 +14,10 @@ const httpTrigger: AzureFunction = async function (
     status: 302,
     cookies,
     headers: {
-      Location: "..",
+      Location: getLogoutLocation(
+        context,
+        b2cPolicies.authorities.signUpSignIn.authority
+      ),
     },
   };
 };
