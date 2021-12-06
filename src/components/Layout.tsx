@@ -1,8 +1,8 @@
 import Footer from "./Footer";
 import Header from "./Header";
-import Welcome from "./Welcome";
+// import Welcome from "./Welcome";
 import { useUserProfile } from "../services/UserProfileContext";
-import { useState } from "react";
+// import { useState } from "react";
 import Spinner from "./Spinner";
 
 type Screen =
@@ -11,7 +11,7 @@ type Screen =
   | "create-catering-application";
 
 const Layout: React.FC = () => {
-  const [screen, setScreen] = useState<Screen>("home");
+  // const [screen, setScreen] = useState<Screen>("home");
   const { loaded, userProfile } = useUserProfile();
 
   let content;
