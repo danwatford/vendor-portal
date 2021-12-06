@@ -22,7 +22,7 @@ export const createExpiredUserCookie = (): Cookie => {
 };
 
 export const createUserCookie = (userId: string, user: User): Cookie => {
-  const userCookieContent = Buffer.from(
+  const base64EncodedCookieValue = Buffer.from(
     JSON.stringify({
       userId,
       user,
@@ -30,12 +30,12 @@ export const createUserCookie = (userId: string, user: User): Cookie => {
   ).toString("base64");
 
   const hmac = createHmac("sha256", process.env.COOKIE_SECRET);
-  hmac.update(userCookieContent);
+  hmac.update(base64EncodedCookieValue);
   const hash = hmac.digest("hex");
 
   return {
     name: "vendorPortalUser",
-    value: hash + ":" + userCookieContent,
+    value: hash + base64EncodedCookieValue,
     secure: true,
     httpOnly: true,
     sameSite: "Strict",
@@ -44,11 +44,14 @@ export const createUserCookie = (userId: string, user: User): Cookie => {
 };
 
 const userFromCookie = (cookieValue: string): [userId: string, user: User] => {
-  if (!cookieValue) {
+  if (!cookieValue || cookieValue.length < 65) {
     return [null, null];
   }
 
-  const [hash, base64EncodedValue] = cookieValue.split(":", 2);
+  console.log("userFromCookie: " + cookieValue);
+
+  const hash = cookieValue.substring(0, 64);
+  const base64EncodedValue = cookieValue.substring(64);
   if (!hash || !base64EncodedValue) {
     return [null, null];
   }
