@@ -10,14 +10,13 @@ const vendorContactsListGuid: string = process.env.VENDORS_CONTACTS_LIST_GUID;
 
 const MAX_COOKIE_AGE_SECONDS = 60 * 60 * 12;
 
-export const createExpiredUserCookie = (): Cookie => {
+export const createInvalidUserCookie = (): Cookie => {
   return {
     name: "vendorPortalUser",
     value: "NA",
     secure: true,
     httpOnly: true,
     sameSite: "Strict",
-    maxAge: 0,
   };
 };
 

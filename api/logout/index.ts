@@ -1,12 +1,12 @@
 import { AzureFunction, Context, Cookie, HttpRequest } from "@azure/functions";
 import { b2cPolicies, getLogoutLocation } from "../common/auth";
-import { createExpiredUserCookie } from "../services/user";
+import { createInvalidUserCookie } from "../services/user";
 
 const httpTrigger: AzureFunction = async function (
   context: Context,
   req: HttpRequest
 ): Promise<void> {
-  const expiredUserCookie = createExpiredUserCookie();
+  const expiredUserCookie = createInvalidUserCookie();
 
   const cookies: Cookie[] = [expiredUserCookie];
 
