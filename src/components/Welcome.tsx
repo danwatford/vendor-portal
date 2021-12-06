@@ -10,11 +10,12 @@ const Welcome: React.FC = () => {
         Welcome to the Broadstairs Folk Week Vendor Portal
       </h1>
       <p>
-        Please use this website to apply to trade at Broadstairs Folk Week 2022.
+        Please use this website to apply for a pitch at Broadstairs Folk Week
+        2022.
       </p>
       <p>
-        Sign in to see the progress of your applications, or create a new
-        application by clicking on the buttons below.
+        Sign in to see the progress of your current applications, or create a
+        new application by clicking on the buttons below.
       </p>
     </div>
   );

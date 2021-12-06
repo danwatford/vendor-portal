@@ -10,18 +10,11 @@ import {
   useClientPrincipal,
 } from "@aaronpowell/react-static-web-apps-auth";
 import { useEffect, useState } from "react";
+import { useUserProfile } from "../services/UserProfileContext";
 // import { useUserProfile } from "./UserProfileContext";
 
 const Layout: React.FC = () => {
-  const { loaded: clientPrincipalLoaded, clientPrincipal } =
-    useClientPrincipal();
-
-  const [message, setMessage] = useState("");
-  useEffect(() => {
-    fetch("/api/get-message?name=Static Web Apps")
-      .then((res) => res.text())
-      .then((data) => setMessage(data));
-  }, [clientPrincipalLoaded]);
+  const { loaded, userProfile } = useUserProfile();
 
   // const { loaded: userProfileLoaded, userProfile } = useUserProfile();
 
@@ -33,16 +26,15 @@ const Layout: React.FC = () => {
 
   let content;
 
-  if (!clientPrincipalLoaded) {
+  if (!loaded) {
     content = <p>Loading app...</p>;
   } else {
-    if (clientPrincipal) {
+    if (userProfile) {
       content = (
         <>
           <p>
             User logged in:
-            {JSON.stringify(clientPrincipal)}
-            {message && <p>{message}</p>}
+            {JSON.stringify(userProfile)}
           </p>
           <Logout />
         </>
