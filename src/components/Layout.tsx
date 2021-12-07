@@ -4,6 +4,7 @@ import Welcome from "./Welcome";
 import { useUserProfile } from "../services/UserProfileContext";
 import { useCallback, useState } from "react";
 import Spinner from "./Spinner";
+import CraftApplicationForm from "./forms/CraftApplicationForm";
 
 type Screen =
   | "home"
@@ -41,6 +42,7 @@ const Layout: React.FC = () => {
           );
           break;
         case "create-craft-application":
+          content = <CraftApplicationForm />;
           break;
         case "create-catering-application":
           break;
@@ -53,7 +55,7 @@ const Layout: React.FC = () => {
       <div>
         <Header />
       </div>
-      <div className="flex-grow">{content}</div>
+      <div className="flex-grow m-auto px-2 w-full max-w-lg">{content}</div>
       <div>
         <Footer></Footer>
       </div>
