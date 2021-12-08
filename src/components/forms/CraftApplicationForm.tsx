@@ -36,7 +36,7 @@ const CraftApplicationForm = () => {
       >
         {(formik) => (
           <form onSubmit={formik.handleSubmit} className={"text-left"}>
-            <LocalPersist storageKey="foo" />
+            <LocalPersist storageKey="craftApplication" />
             <TextInput
               name="stallholderName"
               label="Name of stallholder"
