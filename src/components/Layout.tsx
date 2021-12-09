@@ -1,4 +1,6 @@
-import Welcome from "./Home";
+import { Routes, Route, Link } from "react-router-dom";
+
+import Home from "./Home";
 import { useUserProfile } from "../services/UserProfileContext";
 import { useCallback, useState } from "react";
 import Spinner from "./Spinner";
@@ -35,7 +37,7 @@ const Layout: React.FC = () => {
       switch (screen) {
         case "home":
           content = (
-            <Welcome
+            <Home
               createCraftApplicationClickedHandler={
                 onCreateCraftApplicationClicked
               }
@@ -56,7 +58,27 @@ const Layout: React.FC = () => {
     }
   }
 
-  return content;
+  // return content;
+  return (
+    <>
+      <Routes>
+        <Route
+          path="*"
+          element={
+            <Home
+              createCraftApplicationClickedHandler={
+                onCreateCraftApplicationClicked
+              }
+              createCateringApplicationClickedHandler={
+                onCreateCateringApplicationClicked
+              }
+            />
+          }
+        />
+        <Route path="/craftApplication" element={<CraftApplicationForm />} />
+      </Routes>
+    </>
+  );
 };
 
 export default Layout;

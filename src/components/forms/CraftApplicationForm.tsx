@@ -1,5 +1,6 @@
 import { Field, Formik } from "formik";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import * as Yup from "yup";
 import {
   CraftFairApplicationWithContact,
@@ -82,6 +83,9 @@ const CraftApplicationForm: React.FC = () => {
 
   return (
     <PageLayout>
+      <Link to="/" className="block text-left">
+        &lt; Back
+      </Link>
       <h1 className="text-2xl font-black">Craft Fair Application Form</h1>
       <Formik
         initialValues={formValues}
@@ -89,6 +93,7 @@ const CraftApplicationForm: React.FC = () => {
           ...CraftFairApplicationValidationSchema,
         })}
         onSubmit={(values, { setSubmitting }) => {
+          console.log("onSubmit called");
           setFormValues(values);
           setSubmitting(false);
         }}
@@ -114,6 +119,8 @@ const CraftApplicationForm: React.FC = () => {
           return (
             <form onSubmit={formik.handleSubmit} className={"text-left"}>
               <LocalPersist storageKey="craftApplication" />
+
+              <h2 className="mt-4 text-2xl font-black">Trader Information</h2>
               <TextInput name="tradingName" label="Trading name" type="text" />
 
               <TextArea
@@ -321,8 +328,10 @@ const CraftApplicationForm: React.FC = () => {
               {!userProfile ? (
                 <div className="mt-2">
                   When you click the Submit button below you will be prompted to
-                  do so. This is so we can store your application against your
-                  username in our database.
+                  sign in to the vendor portal. This is so we can store your
+                  application against your username in our database. If you have
+                  not already registered with the vendor portal, you will be
+                  able to do so during the submit process.
                 </div>
               ) : null}
 
@@ -339,7 +348,12 @@ const CraftApplicationForm: React.FC = () => {
                 deposit fee has been paid.
               </div>
 
-              <button type="submit">Submit</button>
+              <button
+                type="submit"
+                className="block m-auto my-4 p-4 bg-bfw-yellow hover:bg-bfw-link rounded text-lg text-menu-text"
+              >
+                Submit Craft Fair Application
+              </button>
             </form>
           );
         }}

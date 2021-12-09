@@ -1,4 +1,5 @@
 import { DefaultButton } from "@fluentui/react";
+import { Link } from "react-router-dom";
 import HomeLayout from "./HomeLayout";
 
 export interface WelcomeProps {
@@ -22,20 +23,16 @@ const Welcome: React.FC<WelcomeProps> = ({
         </p>
         <p>
           Sign in to see the progress of your current applications, or create a
-          new application by clicking on the buttons below.
+          new application by selecting the links below.
         </p>
       </div>
-      <div className="mt-2">
-        <DefaultButton
-          className="m-1 p-1 w-48"
-          text="Craft Fair Application"
-          onClick={createCraftApplicationClickedHandler}
-        />
-        <DefaultButton
-          className="m-1 p-1 w-48"
-          text="Catering Application"
-          onClick={createCateringApplicationClickedHandler}
-        />
+      <div className="mt-8">
+        <Link to="/craftApplication" className="m-4 underline">
+          Craft Fair Application
+        </Link>
+        <Link to="/cateringApplication" className="m-4 underline">
+          Catering Application
+        </Link>
       </div>
     </HomeLayout>
   );
