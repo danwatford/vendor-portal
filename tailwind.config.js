@@ -14,6 +14,10 @@ module.exports = {
       backgroundImage: {
         "header-logo": "url('/src/images/bfw-logo-365x105-1.png')",
         "horse-white": "url('/src/images/horse-white-44x122-1.png')",
+        "watford-consulting-logo-white":
+          "url('/src/images/Watford Consulting Logo_White.png')",
+        "watford-consulting-logo":
+          "url('/src/images/Watford Consulting Logo.png')",
       },
       fontFamily: {
         sans: ["Myriad Pro Regular", ...defaultTheme.fontFamily["sans"]],
