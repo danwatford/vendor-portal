@@ -1,16 +1,9 @@
-import { DefaultButton } from "@fluentui/react";
 import { Link } from "react-router-dom";
 import HomeLayout from "./HomeLayout";
 
-export interface WelcomeProps {
-  createCraftApplicationClickedHandler: () => void;
-  createCateringApplicationClickedHandler: () => void;
-}
+export interface WelcomeProps {}
 
-const Welcome: React.FC<WelcomeProps> = ({
-  createCraftApplicationClickedHandler,
-  createCateringApplicationClickedHandler,
-}) => {
+const Welcome: React.FC<WelcomeProps> = () => {
   return (
     <HomeLayout>
       <div className="space-y-2 text-left">

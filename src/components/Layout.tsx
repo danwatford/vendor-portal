@@ -1,80 +1,28 @@
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
 import Home from "./Home";
 import { useUserProfile } from "../services/UserProfileContext";
-import { useCallback, useState } from "react";
 import Spinner from "./Spinner";
 import CraftApplicationForm from "./forms/CraftApplicationForm";
 
-type Screen =
-  | "home"
-  | "create-craft-application"
-  | "create-catering-application";
-
 const Layout: React.FC = () => {
-  const [screen, setScreen] = useState<Screen>("home");
-  const { loaded, userProfile } = useUserProfile();
+  const { loaded } = useUserProfile();
 
-  const onCreateCraftApplicationClicked = useCallback(() => {
-    setScreen("create-craft-application");
-  }, []);
-
-  const onCreateCateringApplicationClicked = useCallback(() => {
-    setScreen("create-catering-application");
-  }, []);
-
-  let content = null;
   if (!loaded) {
-    content = (
+    return (
       <div className="flex flex-col h-screen bg-bfw-yellow">
         <div className="flex-grow" />
         <Spinner />
         <div className="flex-grow" />
       </div>
     );
-  } else {
-    if (!userProfile) {
-      switch (screen) {
-        case "home":
-          content = (
-            <Home
-              createCraftApplicationClickedHandler={
-                onCreateCraftApplicationClicked
-              }
-              createCateringApplicationClickedHandler={
-                onCreateCateringApplicationClicked
-              }
-            />
-          );
-          break;
-
-        case "create-craft-application":
-          content = <CraftApplicationForm />;
-          break;
-
-        case "create-catering-application":
-          break;
-      }
-    }
   }
 
   // return content;
   return (
     <>
       <Routes>
-        <Route
-          path="*"
-          element={
-            <Home
-              createCraftApplicationClickedHandler={
-                onCreateCraftApplicationClicked
-              }
-              createCateringApplicationClickedHandler={
-                onCreateCateringApplicationClicked
-              }
-            />
-          }
-        />
+        <Route path="*" element={<Home />} />
         <Route path="/craftApplication" element={<CraftApplicationForm />} />
       </Routes>
     </>
