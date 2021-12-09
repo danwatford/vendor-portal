@@ -1,4 +1,5 @@
 import { DefaultButton } from "@fluentui/react";
+import HomeLayout from "./HomeLayout";
 
 export interface WelcomeProps {
   createCraftApplicationClickedHandler: () => void;
@@ -10,7 +11,7 @@ const Welcome: React.FC<WelcomeProps> = ({
   createCateringApplicationClickedHandler,
 }) => {
   return (
-    <div className="">
+    <HomeLayout>
       <div className="space-y-2 text-left">
         <h1 className="text-2xl text-center">
           Welcome to the Broadstairs Folk Week Vendor Portal
@@ -36,7 +37,7 @@ const Welcome: React.FC<WelcomeProps> = ({
           onClick={createCateringApplicationClickedHandler}
         />
       </div>
-    </div>
+    </HomeLayout>
   );
 };
 

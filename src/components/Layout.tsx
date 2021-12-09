@@ -1,6 +1,4 @@
-import Footer from "./Footer";
-import Header from "./Header";
-import Welcome from "./Welcome";
+import Welcome from "./Home";
 import { useUserProfile } from "../services/UserProfileContext";
 import { useCallback, useState } from "react";
 import Spinner from "./Spinner";
@@ -23,7 +21,7 @@ const Layout: React.FC = () => {
     setScreen("create-catering-application");
   }, []);
 
-  let content;
+  let content = null;
   if (!loaded) {
     content = <Spinner />;
   } else {
@@ -41,26 +39,18 @@ const Layout: React.FC = () => {
             />
           );
           break;
+
         case "create-craft-application":
           content = <CraftApplicationForm />;
           break;
+
         case "create-catering-application":
           break;
       }
     }
   }
 
-  return (
-    <div className="h-screen flex flex-col gap-1">
-      <div>
-        <Header />
-      </div>
-      <div className="flex-grow m-auto px-2 w-full max-w-lg">{content}</div>
-      <div>
-        <Footer></Footer>
-      </div>
-    </div>
-  );
+  return content;
 };
 
 export default Layout;
