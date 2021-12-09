@@ -23,7 +23,13 @@ const Layout: React.FC = () => {
 
   let content = null;
   if (!loaded) {
-    content = <Spinner />;
+    content = (
+      <div className="flex flex-col h-screen bg-bfw-yellow">
+        <div className="flex-grow" />
+        <Spinner />
+        <div className="flex-grow" />
+      </div>
+    );
   } else {
     if (!userProfile) {
       switch (screen) {
