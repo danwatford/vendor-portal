@@ -6,6 +6,11 @@ const httpTrigger: AzureFunction = async function (
   context: Context,
   req: HttpRequest
 ): Promise<void> {
+  const referringUrl = req.headers.referer;
+  const eventualRedirectUrl = referringUrl
+    ? referringUrl
+    : new URL("/", context.req.headers["x-ms-original-url"]).href;
+
   // If the user can be identified from a cookie then there is no need to redirect to the identity provider.
   const user = await getUserFromCookie(req.headers.cookie);
 
@@ -13,7 +18,7 @@ const httpTrigger: AzureFunction = async function (
     context.res = {
       status: 302,
       headers: {
-        Location: "..",
+        Location: eventualRedirectUrl,
       },
     };
   } else {
@@ -21,7 +26,10 @@ const httpTrigger: AzureFunction = async function (
       context,
       b2cPolicies.authorities.signUpSignIn.authority,
       [],
-      APP_STATES.LOGIN
+      {
+        type: "login",
+        postAuthRedirectUrl: eventualRedirectUrl,
+      }
     );
 
     context.res = {

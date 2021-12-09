@@ -7,6 +7,7 @@ import {
 } from "../common/auth";
 import { createOrUpdateUser, createUserCookie } from "../services/user";
 import { User } from "../interface/user";
+import { decodeAuthState } from "../services/auth-state";
 
 const httpTrigger: AzureFunction = async function (
   context: Context,
@@ -17,8 +18,10 @@ const httpTrigger: AzureFunction = async function (
 
   context.log("In redirect. Checking query state: " + req.query.state);
 
+  const authState = decodeAuthState(req.query.state);
+
   // determine where the request comes from
-  if (req.query.state === APP_STATES.LOGIN) {
+  if (authState.type === "login") {
     context.log("In LOGIN state");
     // prepare the request for authentication
     const tokenRequest: AuthorizationCodeRequest = {
@@ -53,7 +56,7 @@ const httpTrigger: AzureFunction = async function (
       status: 302,
       cookies,
       headers: {
-        Location: "..",
+        Location: authState.postAuthRedirectUrl,
       },
     };
   }

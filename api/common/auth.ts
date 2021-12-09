@@ -1,6 +1,7 @@
 import { URL } from "url";
 import { Context } from "@azure/functions";
 import * as msal from "@azure/msal-node";
+import { AuthState, encodeAuthState } from "../services/auth-state";
 
 /**
  * The MSAL.js library allows you to pass your custom state as state parameter in the Request object
@@ -63,18 +64,11 @@ export const getConfidentialClientConfig = (context: Context) => {
   };
 };
 
-/**
- * This method is used to generate an auth code request
- * @param {string} authority: the authority to request the auth code from
- * @param {array} scopes: scopes to request the auth code for
- * @param {string} state: state of the application
- * @param {Object} res: express middleware response object
- */
 export const getAuthCodeLocation = async (
   context: Context,
   authority: string,
   scopes: string[],
-  state: string
+  state: AuthState
 ): Promise<string> => {
   const confidentialClientConfig = getConfidentialClientConfig(context);
   const cca = getConfidentialClientApplication(context);
@@ -88,7 +82,7 @@ export const getAuthCodeLocation = async (
     redirectUri: confidentialClientConfig.auth.redirectUri,
     authority,
     scopes,
-    state,
+    state: encodeAuthState(state),
   };
 
   // request an authorization code to exchange for a token
