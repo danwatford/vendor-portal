@@ -1,7 +1,6 @@
 import { AzureFunction, Context, Cookie, HttpRequest } from "@azure/functions";
 import { AuthorizationCodeRequest } from "@azure/msal-node";
 import {
-  APP_STATES,
   getConfidentialClientApplication,
   getConfidentialClientConfig,
 } from "../common/auth";

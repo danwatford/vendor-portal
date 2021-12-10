@@ -95,10 +95,24 @@ const CraftApplicationForm: React.FC = () => {
           ...CraftFairApplicationValidationSchema,
         })}
         onSubmit={(values, { setSubmitting }) => {
-          console.log("onSubmit called");
-          setFormValues(values);
-          navigate("/submittingCraftApplication");
-          setSubmitting(false);
+          if (userProfile) {
+            setFormValues(values);
+            navigate("/submittingCraftApplication");
+            setSubmitting(false);
+          } else {
+            const postLoginRedirectUrl = new URL(
+              "/submittingCraftApplication",
+              document.location.href
+            );
+
+            const loginUrl = new URL("/api/login", document.location.href);
+            loginUrl.searchParams.append(
+              "postLoginRedirectUrl",
+              postLoginRedirectUrl.href
+            );
+
+            window.location.assign(loginUrl.href);
+          }
         }}
       >
         {(formik) => {
