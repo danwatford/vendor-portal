@@ -3,6 +3,7 @@ import { BrowserRouter } from "react-router-dom";
 
 import "./App.css";
 import Layout from "./components/Layout";
+import { ApplicationsContextProvider } from "./services/ApplicationsContext";
 import { UserProfileContextProvider } from "./services/UserProfileContext";
 
 function App() {
@@ -10,7 +11,9 @@ function App() {
     <BrowserRouter>
       <div className="App">
         <UserProfileContextProvider>
-          <Layout />
+          <ApplicationsContextProvider>
+            <Layout />
+          </ApplicationsContextProvider>
         </UserProfileContextProvider>
       </div>
     </BrowserRouter>

@@ -34,6 +34,9 @@ export type CraftFairApplication = {
   pitchElectricity: ElectricalOption;
   campingRequired: boolean;
   tables: number;
+  totalCost: number;
+  dbId?: number;
+  created?: string;
 };
 
 export type CraftFairApplicationWithContact = VendorContact &

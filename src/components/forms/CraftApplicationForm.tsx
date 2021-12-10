@@ -83,6 +83,7 @@ const CraftApplicationForm: React.FC = () => {
       pitchElectricity: "none",
       campingRequired: false,
       tables: 0,
+      totalCost: 0,
     }
   );
 
@@ -315,6 +316,7 @@ const CraftApplicationForm: React.FC = () => {
               </div>
               <div className="flex flex-row justify-between mt-2">
                 <span>Tables required:</span>
+
                 <Field name="tables" as="select">
                   <option value="0">0</option>
                   <option value="1">1</option>

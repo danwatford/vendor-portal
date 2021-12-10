@@ -10,4 +10,5 @@ export const CraftFairApplicationValidationSchema = {
   country: Yup.string().required("Required"),
   landline: Yup.string(),
   mobile: Yup.string(),
+  tables: Yup.number(),
 };

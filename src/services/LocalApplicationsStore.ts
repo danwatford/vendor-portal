@@ -15,10 +15,14 @@ export const getCurrentCraftApplication = (): CraftFairApplication | null => {
 export const saveCurrentCraftApplication = (
   craftApplication: CraftFairApplication
 ) => {
-  window.localStorage.setItem(
-    CRAFT_STORAGE_KEY,
-    JSON.stringify(craftApplication)
-  );
+  // The tables property of the CraftFairApplication should be a number, but the Formik select field used
+  // to edit the property sets it to text. Convert to a number before writing to storage.
+  const converted: CraftFairApplication = {
+    ...craftApplication,
+    tables: parseInt(craftApplication.tables.toString()),
+  };
+
+  window.localStorage.setItem(CRAFT_STORAGE_KEY, JSON.stringify(converted));
 };
 
 export const clearCurrentCraftApplication = () => {
