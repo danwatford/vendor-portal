@@ -1,12 +1,16 @@
 import { Field, Formik } from "formik";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import {
   CraftFairApplicationWithContact,
   ElectricalOption,
   PitchType,
 } from "../../interfaces/Applications";
+import {
+  getCurrentCraftApplication,
+  saveCurrentCraftApplication,
+} from "../../services/LocalApplicationsStore";
 import { useUserProfile } from "../../services/UserProfileContext";
 import PageLayout from "../PageLayout";
 import { AddressField, PitchSelection, TextArea, TextInput } from "./Fields";
@@ -56,6 +60,7 @@ const getPitchElectricityCost = (electricalOption: ElectricalOption) => {
 
 const CraftApplicationForm: React.FC = () => {
   const { userProfile } = useUserProfile();
+  const navigate = useNavigate();
 
   const [formValues, setFormValues] = useState<CraftFairApplicationWithContact>(
     {
@@ -83,9 +88,6 @@ const CraftApplicationForm: React.FC = () => {
 
   return (
     <PageLayout>
-      <Link to="/" className="block text-left">
-        &lt; Back
-      </Link>
       <h1 className="text-2xl font-black">Craft Fair Application Form</h1>
       <Formik
         initialValues={formValues}
@@ -95,6 +97,7 @@ const CraftApplicationForm: React.FC = () => {
         onSubmit={(values, { setSubmitting }) => {
           console.log("onSubmit called");
           setFormValues(values);
+          navigate("/submittingCraftApplication");
           setSubmitting(false);
         }}
       >
@@ -118,7 +121,10 @@ const CraftApplicationForm: React.FC = () => {
 
           return (
             <form onSubmit={formik.handleSubmit} className={"text-left"}>
-              <LocalPersist storageKey="craftApplication" />
+              <LocalPersist
+                loadValuesFromStorage={getCurrentCraftApplication}
+                saveValuesToStorage={saveCurrentCraftApplication}
+              />
 
               <h2 className="mt-4 text-2xl font-black">Trader Information</h2>
               <TextInput name="tradingName" label="Trading name" type="text" />
@@ -132,12 +138,14 @@ const CraftApplicationForm: React.FC = () => {
         your normal stall. Please note that you might not be allowed to sell
         items that are not listed in this section"
               />
-              {/* <TextInput
-      name="contactFirstNames"
-      label="First name(s)"
-      type="text"
-    />
-    <TextInput name="contactLastName" label="Last name" type="text" /> */}
+
+              <TextInput
+                name="landline"
+                label="Landline phone number"
+                type="tel"
+              />
+              <TextInput name="mobile" label="Mobile phone number" type="tel" />
+
               <AddressField />
 
               <h2 className="mt-4 text-2xl font-black">Pitch selection</h2>

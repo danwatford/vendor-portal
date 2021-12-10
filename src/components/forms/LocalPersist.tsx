@@ -1,31 +1,30 @@
-import { useEffect, useRef } from "react";
+import { PropsWithChildren, useEffect, useRef } from "react";
 import { useFormikContext } from "formik";
 import isEqual from "react-fast-compare";
 import { useDebouncedCallback } from "use-debounce";
 
-export interface FormikPersistProps {
-  storageKey: string;
+export interface FormikPersistProps<T> {
+  loadValuesFromStorage: () => T | null;
+  saveValuesToStorage: (values: T) => void;
 }
 
-const LocalPersist: React.FC<FormikPersistProps> = <T,>(
-  props: FormikPersistProps
-) => {
+function LocalPersist<T>({
+  loadValuesFromStorage,
+  saveValuesToStorage,
+}: PropsWithChildren<FormikPersistProps<T>>) {
   const { values, setValues } = useFormikContext<T>();
   const prefValuesRef = useRef<T>();
 
   useEffect(() => {
-    const savedForm = window.localStorage.getItem(props.storageKey);
+    const savedForm = loadValuesFromStorage();
 
     if (savedForm) {
-      const parsedForm = JSON.parse(savedForm);
-
-      prefValuesRef.current = parsedForm;
-      setValues(parsedForm);
+      setValues(savedForm);
     }
-  }, [props.storageKey, setValues]);
+  }, [loadValuesFromStorage, setValues]);
 
   const onSave = (values: T) => {
-    window.localStorage.setItem(props.storageKey, JSON.stringify(values));
+    saveValuesToStorage(values);
   };
 
   const debouncedOnSave = useDebouncedCallback(onSave, 300);
@@ -41,6 +40,6 @@ const LocalPersist: React.FC<FormikPersistProps> = <T,>(
   });
 
   return null;
-};
+}
 
 export default LocalPersist;

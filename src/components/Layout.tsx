@@ -4,6 +4,7 @@ import Home from "./Home";
 import { useUserProfile } from "../services/UserProfileContext";
 import Spinner from "./Spinner";
 import CraftApplicationForm from "./forms/CraftApplicationForm";
+import SubmittingCraftApplication from "./SubmittingCraftApplication";
 
 const Layout: React.FC = () => {
   const { loaded } = useUserProfile();
@@ -24,6 +25,10 @@ const Layout: React.FC = () => {
       <Routes>
         <Route path="*" element={<Home />} />
         <Route path="/craftApplication" element={<CraftApplicationForm />} />
+        <Route
+          path="/submittingCraftApplication"
+          element={<SubmittingCraftApplication />}
+        />
       </Routes>
     </>
   );
