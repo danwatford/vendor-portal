@@ -32,5 +32,6 @@ export interface CraftFairApplicationListItem extends ListItem {
   // PitchElectricity: string;
   // CampingRequired: boolean;
   // Tables: number;
+  TotalCost: number;
   UserId: string;
 }

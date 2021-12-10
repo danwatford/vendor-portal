@@ -1,10 +1,11 @@
 import {
   CraftFairApplication,
+  CraftFairApplicationRunType,
   CraftFairApplicationWithContact,
-  CraftFairApplicationWithUserId,
 } from "../interface/Applications";
 import { CraftFairApplicationListItem } from "../interface/SpListItems";
 import { User } from "../interface/user";
+import { getTotalCraftFairApplicationCost } from "./application-pricing";
 import { applyToItemsByFilter, createItem, updateItem } from "./Sp";
 
 const vendorSiteUrl: string = process.env.VENDORS_SITE;
@@ -14,7 +15,7 @@ const vendorCraftApplicationsListGuid: string =
 const getCraftApplication = async (
   dbId: number,
   userId: string
-): Promise<CraftFairApplicationWithUserId> => {
+): Promise<CraftFairApplication> => {
   const applications = await getCraftApplicationsByFilter(
     `ID eq '${dbId}' and UserId eq '${userId}'`
   );
@@ -25,7 +26,7 @@ const getCraftApplication = async (
   }
 };
 
-const getCraftApplicationsForUser = async (
+export const getCraftApplicationsForUser = async (
   userId: string
 ): Promise<CraftFairApplication[]> => {
   return getCraftApplicationsByFilter(`UserId eq '${userId}'`);
@@ -33,10 +34,10 @@ const getCraftApplicationsForUser = async (
 
 const getCraftApplicationsByFilter = async (
   filter?: string
-): Promise<CraftFairApplicationWithUserId[]> => {
+): Promise<CraftFairApplication[]> => {
   return applyToItemsByFilter<
     CraftFairApplicationListItem,
-    CraftFairApplicationWithUserId[]
+    CraftFairApplication[]
   >(
     vendorSiteUrl,
     vendorCraftApplicationsListGuid,
@@ -47,6 +48,39 @@ const getCraftApplicationsByFilter = async (
     },
     filter
   );
+};
+
+// Create a craft fair application based on input from an API client.
+// This function allows us to ensure only desired properties are copied from the object provided by the API client.
+export const sanitiseCraftApplicationFromApiClient = (
+  maybeApplication: any
+): CraftFairApplication => {
+  const application = CraftFairApplicationRunType.check(maybeApplication);
+
+  const sanitisedApplication: CraftFairApplication = {
+    dbId: application.dbId,
+    tradingName: application.tradingName,
+    addressLine1: application.addressLine1,
+    addressLine2: application.addressLine2,
+    city: application.city,
+    state: application.state,
+    postcode: application.postcode,
+    country: application.country,
+    landline: application.landline,
+    mobile: application.mobile,
+    descriptionOfStall: application.descriptionOfStall,
+    pitchType: application.pitchType,
+    pitchAdditionalWidth: application.pitchAdditionalWidth,
+    pitchVanSpaceRequired: application.pitchVanSpaceRequired,
+    pitchElectricity: application.pitchElectricity,
+    campingRequired: application.campingRequired,
+    tables: application.tables,
+  };
+
+  sanitisedApplication.totalCost =
+    getTotalCraftFairApplicationCost(sanitisedApplication);
+
+  return sanitisedApplication;
 };
 
 export const createOrUpdateCraftApplication = async (
@@ -106,7 +140,7 @@ const createCraftApplication = async (
 };
 
 const craftApplicationToListItem = (
-  craftApplication: CraftFairApplicationWithContact
+  craftApplication: CraftFairApplication
 ): CraftFairApplicationListItem => {
   return {
     ID: craftApplication.dbId,
@@ -124,6 +158,7 @@ const craftApplicationToListItem = (
     Landline: craftApplication.landline,
     Mobile: craftApplication.mobile,
     UserId: craftApplication.userId,
+    TotalCost: craftApplication.totalCost,
   };
 };
 
@@ -151,6 +186,7 @@ const listItemToCraftApplication = (
     pitchVanSpaceRequired: true,
     pitchElectricity: "none",
     campingRequired: true,
+    totalCost: item.TotalCost,
     tables: 0,
     created: item.Created,
   };

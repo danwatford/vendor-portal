@@ -1,8 +1,12 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions";
+import { ValidationError } from "runtypes";
+
 import { getUserFromCookie } from "../services/user";
 
-import { CraftFairApplication } from "../interface/Applications";
-import { createOrUpdateCraftApplication } from "../services/applications";
+import {
+  createOrUpdateCraftApplication,
+  sanitiseCraftApplicationFromApiClient,
+} from "../services/applications";
 
 const httpTrigger: AzureFunction = async function (
   context: Context,
@@ -17,20 +21,41 @@ const httpTrigger: AzureFunction = async function (
       body: "User must be signed in before submitting applications.",
     };
   } else {
-    const application: CraftFairApplication = JSON.parse(req.body);
+    try {
+      const application = sanitiseCraftApplicationFromApiClient(
+        JSON.parse(req.body)
+      );
 
-    const persistedApplication = await createOrUpdateCraftApplication(
-      application,
-      user
-    );
+      const persistedApplication = await createOrUpdateCraftApplication(
+        application,
+        user
+      );
 
-    context.res = {
-      status: 200,
-      body: JSON.stringify(persistedApplication),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
+      context.res = {
+        status: 200,
+        body: JSON.stringify(persistedApplication),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
+      return;
+    } catch (err) {
+      if (err?.name === "ValidationError") {
+        const validationError = err as ValidationError;
+        if (err?.code === "CONTENT_INCORRECT") {
+          context.res = {
+            status: 400,
+            body: JSON.stringify(validationError.details),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          };
+          return;
+        }
+      }
+      console.error(err);
+      throw err;
+    }
   }
 };
 
