@@ -10,7 +10,7 @@ const httpTrigger: AzureFunction = async function (
   req: HttpRequest
 ): Promise<void> {
   // Only authenticated users should call this function.
-  const user = await getUserFromCookie(req.headers.cookie);
+  const user = getUserFromCookie(req.headers.cookie);
 
   if (!user) {
     context.res = {
