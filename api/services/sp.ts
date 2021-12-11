@@ -2,7 +2,7 @@ import { sp } from "@pnp/sp-commonjs/presets/all";
 import { Web } from "@pnp/sp-commonjs/webs";
 import { IItemAddResult, IItemUpdateResult } from "@pnp/sp-commonjs/items";
 import { SPFetchClient } from "@pnp/nodejs-commonjs";
-import { ListItem } from "../interface/SpListItems";
+import { ListItem } from "../interfaces/SpListItems";
 
 const siteUrl: string = process.env.VENDORS_SITE;
 const clientId: string = process.env.VENDORS_CLIENT_ID;

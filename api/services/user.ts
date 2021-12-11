@@ -1,9 +1,9 @@
 import { Cookie } from "@azure/functions";
 import { parse } from "cookie";
 import { createHmac } from "crypto";
-import { UserListItem } from "../interface/SpListItems";
-import { User } from "../interface/user";
-import { applyToItemsByFilter, createItem, updateItem } from "./Sp";
+import { UserListItem } from "../interfaces/SpListItems";
+import { User } from "../interfaces/user";
+import { applyToItemsByFilter, createItem, updateItem } from "./sp";
 
 const vendorSiteUrl: string = process.env.VENDORS_SITE;
 const vendorContactsListGuid: string = process.env.VENDORS_CONTACTS_LIST_GUID;

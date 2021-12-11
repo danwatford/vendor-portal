@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { User } from "../../api/interface/user";
+import { User } from "../../api/interfaces/user";
 
 export type UserProfile = User;
 

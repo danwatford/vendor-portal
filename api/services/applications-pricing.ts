@@ -2,7 +2,7 @@ import {
   CraftFairApplication,
   ElectricalOption,
   PitchType,
-} from "../interface/Applications";
+} from "../interfaces/applications";
 
 const pitchBaseCost: Readonly<Record<PitchType, number>> = {
   standardNoShelter: 460,

@@ -3,10 +3,8 @@ import { ValidationError } from "runtypes";
 
 import { getUserFromCookie } from "../services/user";
 
-import {
-  createOrUpdateCraftApplication,
-  sanitiseCraftApplicationFromApiClient,
-} from "../services/applications";
+import { sanitiseCraftApplicationFromApiClient } from "../services/applications-sanitise";
+import { submitCraftFairApplication } from "../services/applications-service";
 
 const httpTrigger: AzureFunction = async function (
   context: Context,
@@ -26,7 +24,7 @@ const httpTrigger: AzureFunction = async function (
         JSON.parse(req.body)
       );
 
-      const persistedApplication = await createOrUpdateCraftApplication(
+      const persistedApplication = await submitCraftFairApplication(
         application,
         user
       );

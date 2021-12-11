@@ -1,5 +1,5 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions";
-import { getCraftApplicationsForUser } from "../services/applications";
+import { getCraftApplicationsForUser } from "../services/applications-service";
 import { getUserFromCookie } from "../services/user";
 
 const httpTrigger: AzureFunction = async function (
