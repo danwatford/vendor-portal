@@ -9,6 +9,15 @@ import {
   Optional,
 } from "runtypes";
 
+export const ApplicationStatusRunType = Union(
+  Literal("Pending Deposit"),
+  Literal("Pending Document Upload"),
+  Literal("Processing"),
+  Literal("Rejected"),
+  Literal("Accepted Pending Payment"),
+  Literal("Accepted")
+);
+
 export const PitchTypeRunType = Union(
   Literal("standardNoShelter"),
   Literal("extraLargeNoShelter"),
@@ -32,6 +41,7 @@ export const VendorContactRunType = Record({
 });
 
 export const CraftFairApplicationRunType = Record({
+  status: Optional(ApplicationStatusRunType),
   tradingName: String,
   addressLine1: String,
   addressLine2: String,
@@ -61,6 +71,7 @@ export type PitchType = Static<typeof PitchTypeRunType>;
 export type ElectricalOption = Static<typeof ElectricalOptionRunType>;
 export type VendorContact = Static<typeof VendorContactRunType>;
 export type CraftFairApplication = Static<typeof CraftFairApplicationRunType>;
+export type ApplicationStatus = Static<typeof ApplicationStatusRunType>;
 
 export type CraftFairApplicationWithContact = VendorContact &
   CraftFairApplication;

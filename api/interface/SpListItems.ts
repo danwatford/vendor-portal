@@ -14,6 +14,7 @@ export interface UserListItem extends ListItem {
 
 export interface CraftFairApplicationListItem extends ListItem {
   Title: string;
+  Status: string;
   DescriptionOfStall: string;
   AddressLine1: string;
   AddressLine2: string;

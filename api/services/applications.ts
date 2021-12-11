@@ -1,7 +1,13 @@
 import {
+  ApplicationStatus,
+  ApplicationStatusRunType,
   CraftFairApplication,
   CraftFairApplicationRunType,
   CraftFairApplicationWithContact,
+  ElectricalOption,
+  ElectricalOptionRunType,
+  PitchType,
+  PitchTypeRunType,
 } from "../interface/Applications";
 import { CraftFairApplicationListItem } from "../interface/SpListItems";
 import { User } from "../interface/user";
@@ -146,6 +152,7 @@ const craftApplicationToListItem = (
   return {
     ID: craftApplication.dbId,
     Title: craftApplication.tradingName,
+    Status: craftApplication.status,
     DescriptionOfStall: craftApplication.descriptionOfStall,
     AddressLine1: craftApplication.addressLine1,
     AddressLine2: craftApplication.addressLine2,
@@ -172,10 +179,22 @@ const craftApplicationToListItem = (
 const listItemToCraftApplication = (
   item: CraftFairApplicationListItem
 ): CraftFairApplicationWithContact => {
+  const status: ApplicationStatus = ApplicationStatusRunType.guard(item.Status)
+    ? item.Status
+    : "Pending Deposit";
+  const pitchType: PitchType = PitchTypeRunType.guard(item.PitchType)
+    ? item.PitchType
+    : "standardNoShelter";
+  const pitchElectricalOptions: ElectricalOption =
+    ElectricalOptionRunType.guard(item.PitchElectricalOptions)
+      ? item.PitchElectricalOptions
+      : "none";
+
   return {
     dbId: item.ID,
     userId: item.UserId,
     tradingName: item.Title,
+    status,
     addressLine1: item.AddressLine1,
     addressLine2: item.AddressLine2,
     city: item.City,
@@ -188,13 +207,13 @@ const listItemToCraftApplication = (
     landline: item.Landline,
     mobile: item.Mobile,
     descriptionOfStall: item.DescriptionOfStall,
-    pitchType: "standardNoShelter",
-    pitchAdditionalWidth: 0,
-    pitchVanSpaceRequired: true,
-    pitchElectricalOptions: "none",
-    campingRequired: true,
+    pitchType,
+    pitchAdditionalWidth: item.PitchAdditionalWidth,
+    pitchVanSpaceRequired: item.PitchVanSpaceRequired,
+    pitchElectricalOptions,
+    campingRequired: item.CampingRequired,
     totalCost: item.TotalCost,
-    tables: 0,
+    tables: item.Tables,
     created: item.Created,
   };
 };
