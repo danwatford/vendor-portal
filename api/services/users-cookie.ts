@@ -9,7 +9,7 @@ const MAX_COOKIE_AGE_SECONDS = 60 * 60 * 12;
 // If we have a user id included in a cookie, use it to look up the user's profile.
 // If the minimum profile fields that are populated by the identity provider are present
 // then we can consider the user identified.
-export const getUserFromCookie = async (cookie: string): Promise<User> => {
+export const getUserFromCookie = (cookie: string): User => {
   if (cookie) {
     const cookies = parse(cookie);
     const vendorPortalUserCookie = cookies.vendorPortalUser;
@@ -18,7 +18,7 @@ export const getUserFromCookie = async (cookie: string): Promise<User> => {
       return user;
     }
   }
-  return undefined;
+  return null;
 };
 
 export const createInvalidUserCookie = (): Cookie => {
