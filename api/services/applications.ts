@@ -55,6 +55,7 @@ const getCraftApplicationsByFilter = async (
 export const sanitiseCraftApplicationFromApiClient = (
   maybeApplication: any
 ): CraftFairApplication => {
+  delete maybeApplication.totalCost;
   const application = CraftFairApplicationRunType.check(maybeApplication);
 
   const sanitisedApplication: CraftFairApplication = {
@@ -72,7 +73,7 @@ export const sanitiseCraftApplicationFromApiClient = (
     pitchType: application.pitchType,
     pitchAdditionalWidth: application.pitchAdditionalWidth,
     pitchVanSpaceRequired: application.pitchVanSpaceRequired,
-    pitchElectricity: application.pitchElectricity,
+    pitchElectricalOptions: application.pitchElectricalOptions,
     campingRequired: application.campingRequired,
     tables: application.tables,
   };
@@ -159,6 +160,12 @@ const craftApplicationToListItem = (
     Mobile: craftApplication.mobile,
     UserId: craftApplication.userId,
     TotalCost: craftApplication.totalCost,
+    PitchType: craftApplication.pitchType,
+    PitchAdditionalWidth: craftApplication.pitchAdditionalWidth,
+    PitchVanSpaceRequired: craftApplication.pitchVanSpaceRequired,
+    PitchElectricalOptions: craftApplication.pitchElectricalOptions,
+    CampingRequired: craftApplication.campingRequired,
+    Tables: craftApplication.tables,
   };
 };
 
@@ -184,7 +191,7 @@ const listItemToCraftApplication = (
     pitchType: "standardNoShelter",
     pitchAdditionalWidth: 0,
     pitchVanSpaceRequired: true,
-    pitchElectricity: "none",
+    pitchElectricalOptions: "none",
     campingRequired: true,
     totalCost: item.TotalCost,
     tables: 0,

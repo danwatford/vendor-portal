@@ -43,7 +43,7 @@ const getPitchPerAdditionalMetreCost = (pitchType: PitchType) => {
   }
 };
 
-const getPitchElectricityCost = (electricalOption: ElectricalOption) => {
+const getPitchElectricalOptionsCost = (electricalOption: ElectricalOption) => {
   switch (electricalOption) {
     case "none":
       return 0;
@@ -80,7 +80,7 @@ const CraftApplicationForm: React.FC = () => {
       pitchType: "standardNoShelter",
       pitchAdditionalWidth: 0,
       pitchVanSpaceRequired: false,
-      pitchElectricity: "none",
+      pitchElectricalOptions: "none",
       campingRequired: false,
       tables: 0,
       totalCost: 0,
@@ -122,8 +122,8 @@ const CraftApplicationForm: React.FC = () => {
           const pitchAddionalWidthCost =
             getPitchPerAdditionalMetreCost(selectedPitchType) *
             formik.values.pitchAdditionalWidth;
-          const pitchElectricalCosts = getPitchElectricityCost(
-            formik.values.pitchElectricity
+          const pitchElectricalCosts = getPitchElectricalOptionsCost(
+            formik.values.pitchElectricalOptions
           );
 
           const totalTablesCost = 12 * formik.values.tables;
@@ -264,37 +264,37 @@ const CraftApplicationForm: React.FC = () => {
               </div>
 
               <PitchSelection
-                name="pitchElectricity"
+                name="pitchElectricalOptions"
                 value="none"
-                price={getPitchElectricityCost("none")}
+                price={getPitchElectricalOptionsCost("none")}
                 label="No additional electricity supply required."
               ></PitchSelection>
 
               <PitchSelection
-                name="pitchElectricity"
+                name="pitchElectricalOptions"
                 value="1 x 13amp socket"
-                price={getPitchElectricityCost("1 x 13amp socket")}
+                price={getPitchElectricalOptionsCost("1 x 13amp socket")}
                 label="1 x 13amp socket @ 1kw of power direct to your stall."
               ></PitchSelection>
 
               <PitchSelection
-                name="pitchElectricity"
+                name="pitchElectricalOptions"
                 value="1 x 16amp socket"
-                price={getPitchElectricityCost("1 x 16amp socket")}
+                price={getPitchElectricalOptionsCost("1 x 16amp socket")}
                 label="1 x 16amp socket @ 1kw of power direct to your stall."
               ></PitchSelection>
 
               <PitchSelection
-                name="pitchElectricity"
+                name="pitchElectricalOptions"
                 value="2 x 13amp socket"
-                price={getPitchElectricityCost("2 x 13amp socket")}
+                price={getPitchElectricalOptionsCost("2 x 13amp socket")}
                 label="2 x 13amp socket @ 1kw of power direct to your stall."
               ></PitchSelection>
 
               <PitchSelection
-                name="pitchElectricity"
+                name="pitchElectricalOptions"
                 value="1 x 32amp supply"
-                price={getPitchElectricityCost("1 x 32amp supply")}
+                price={getPitchElectricalOptionsCost("1 x 32amp supply")}
                 label="1 x 32amp supply @ 1kw of power direct to your stall."
               ></PitchSelection>
 

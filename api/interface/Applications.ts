@@ -45,7 +45,7 @@ export const CraftFairApplicationRunType = Record({
   pitchType: PitchTypeRunType,
   pitchAdditionalWidth: Number,
   pitchVanSpaceRequired: Boolean,
-  pitchElectricity: ElectricalOptionRunType,
+  pitchElectricalOptions: ElectricalOptionRunType,
   campingRequired: Boolean,
   tables: Number,
   totalCost: Optional(Number),

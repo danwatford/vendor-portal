@@ -26,12 +26,12 @@ export interface CraftFairApplicationListItem extends ListItem {
   ContactFirstName: string;
   ContactLastName: string;
   ContactEmail: string;
-  // PitchType: string;
-  // PitchAdditionalWidth: number;
-  // PitchVanSpaceRequired: boolean;
-  // PitchElectricity: string;
-  // CampingRequired: boolean;
-  // Tables: number;
+  PitchType: string;
+  PitchAdditionalWidth: number;
+  PitchVanSpaceRequired: boolean;
+  PitchElectricalOptions: string;
+  CampingRequired: boolean;
+  Tables: number;
   TotalCost: number;
   UserId: string;
 }

@@ -33,7 +33,8 @@ export const getTotalCraftFairApplicationCost = (
   const addionalWidthCost =
     pitchAdditionalWidthCost[application.pitchType] *
     application.pitchAdditionalWidth;
-  const electricalCost = pitchEletricalOptionCost[application.pitchElectricity];
+  const electricalCost =
+    pitchEletricalOptionCost[application.pitchElectricalOptions];
 
   const tablesCost = 12 * application.tables;
 

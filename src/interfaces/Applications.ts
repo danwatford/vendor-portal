@@ -31,7 +31,7 @@ export type CraftFairApplication = {
   pitchType: PitchType;
   pitchAdditionalWidth: number;
   pitchVanSpaceRequired: boolean;
-  pitchElectricity: ElectricalOption;
+  pitchElectricalOptions: ElectricalOption;
   campingRequired: boolean;
   tables: number;
   totalCost: number;
