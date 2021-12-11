@@ -1,7 +1,7 @@
 import { useApplications } from "../services/ApplicationsContext";
 
 const ApplicationsList: React.FC = () => {
-  const { loaded, applications } = useApplications();
+  const { loaded, applications, refreshApplications } = useApplications();
 
   if (!loaded) {
     return <div>Loading applications...</div>;
@@ -26,7 +26,14 @@ const ApplicationsList: React.FC = () => {
     );
   });
 
-  return <div className="ml-2 border-2 rounded">{applicationsComponents}</div>;
+  return (
+    <div className="ml-2 border-2 rounded">
+      <div className="text-right">
+        <button onClick={refreshApplications}>Refresh</button>
+      </div>
+      {applicationsComponents}
+    </div>
+  );
 };
 
 export default ApplicationsList;
