@@ -1,10 +1,9 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions";
 import { ValidationError } from "runtypes";
 
-import { getUserFromCookie } from "../services/user";
-
 import { sanitiseCraftApplicationFromApiClient } from "../services/applications-sanitise";
 import { submitCraftFairApplication } from "../services/applications-service";
+import { getUserFromCookie } from "../services/users-cookie";
 
 const httpTrigger: AzureFunction = async function (
   context: Context,

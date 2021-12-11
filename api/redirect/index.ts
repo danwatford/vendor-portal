@@ -4,9 +4,10 @@ import {
   getConfidentialClientApplication,
   getConfidentialClientConfig,
 } from "../common/auth";
-import { createOrUpdateUser, createUserCookie } from "../services/user";
+import { createOrUpdateUser } from "../services/users-service";
 import { User } from "../interfaces/user";
 import { decodeAuthState } from "../services/auth-state";
+import { createUserCookie } from "../services/users-cookie";
 
 const httpTrigger: AzureFunction = async function (
   context: Context,

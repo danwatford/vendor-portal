@@ -1,5 +1,5 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions";
-import { getUserFromCookie } from "../services/user";
+import { getUserFromCookie } from "../services/users-cookie";
 
 const httpTrigger: AzureFunction = async function (
   context: Context,

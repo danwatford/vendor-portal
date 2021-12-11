@@ -1,6 +1,6 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions";
 import { b2cPolicies, getAuthCodeLocation } from "../common/auth";
-import { getUserFromCookie } from "../services/user";
+import { getUserFromCookie } from "../services/users-cookie";
 
 const httpTrigger: AzureFunction = async function (
   context: Context,
