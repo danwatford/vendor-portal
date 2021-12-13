@@ -1,5 +1,11 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { CraftFairApplicationWithContact } from "../interfaces/Applications";
+import {
+  getApplications,
+  isRefreshingApplications,
+  refreshApplicationsList,
+  subscribeApplicationListChange,
+} from "./ApplicationsManager";
 import { useUserProfile } from "./UserProfileContext";
 
 export type IApplicationsContext = {
@@ -26,22 +32,21 @@ const ApplicationsContextProvider = ({
   const { userProfile } = useUserProfile();
   const [applications, setApplications] = useState<
     CraftFairApplicationWithContact[]
-  >([]);
-  const [loaded, setLoaded] = useState(false);
+  >(() => getApplications());
+  const [loaded, setLoaded] = useState(() => !isRefreshingApplications());
 
   const fetchApplications = useCallback(async () => {
-    try {
-      setLoaded(false);
-      const res = await fetch("/api/getApplications");
-      const json: CraftFairApplicationWithContact[] = await res.json();
-      if (json) {
-        setApplications(json);
-      }
-    } catch (e) {
-      console.error(`Failed to unpack applications from JSON.`, e);
-    }
-    setLoaded(true);
+    refreshApplicationsList();
   }, []);
+
+  const applicationsListChangeHandler = useCallback(() => {
+    setLoaded(!isRefreshingApplications());
+    setApplications(getApplications());
+  }, []);
+
+  useEffect(() => {
+    subscribeApplicationListChange(applicationsListChangeHandler);
+  }, [applicationsListChangeHandler]);
 
   useEffect(() => {
     if (userProfile) {

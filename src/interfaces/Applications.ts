@@ -39,5 +39,30 @@ export type CraftFairApplication = {
   created?: string;
 };
 
+export type LocalCraftFairApplication = CraftFairApplication & {
+  draftId: number;
+  lastSaved?: string;
+};
+
 export type CraftFairApplicationWithContact = VendorContact &
   CraftFairApplication;
+
+export const initialCraftFairApplication: CraftFairApplication = {
+  tradingName: "",
+  addressLine1: "",
+  addressLine2: "",
+  city: "",
+  state: "",
+  postcode: "",
+  country: "United Kingdom",
+  landline: "",
+  mobile: "",
+  descriptionOfStall: "",
+  pitchType: "standardNoShelter",
+  pitchAdditionalWidth: 0,
+  pitchVanSpaceRequired: false,
+  pitchElectricalOptions: "none",
+  campingRequired: false,
+  tables: 0,
+  totalCost: 0,
+};

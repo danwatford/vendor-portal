@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import "./App.css";
 import Layout from "./components/Layout";
 import { ApplicationsContextProvider } from "./services/ApplicationsContext";
+import { DraftApplicationsContextProvider } from "./services/DraftApplicationsContext";
 import { UserProfileContextProvider } from "./services/UserProfileContext";
 
 function App() {
@@ -11,9 +12,11 @@ function App() {
     <BrowserRouter>
       <div className="App">
         <UserProfileContextProvider>
-          <ApplicationsContextProvider>
-            <Layout />
-          </ApplicationsContextProvider>
+          <DraftApplicationsContextProvider>
+            <ApplicationsContextProvider>
+              <Layout />
+            </ApplicationsContextProvider>
+          </DraftApplicationsContextProvider>
         </UserProfileContextProvider>
       </div>
     </BrowserRouter>

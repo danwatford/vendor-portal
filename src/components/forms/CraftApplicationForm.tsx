@@ -1,5 +1,5 @@
 import { Field, Formik } from "formik";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import {
@@ -7,9 +7,10 @@ import {
   ElectricalOption,
   PitchType,
 } from "../../interfaces/Applications";
+import { saveCurrentDraftApplication } from "../../services/ApplicationsManager";
 import {
-  getCurrentCraftApplication,
-  saveCurrentCraftApplication,
+  getCurrentEditingApplication,
+  saveCurrentEditingApplication,
 } from "../../services/LocalApplicationsStore";
 import { useUserProfile } from "../../services/UserProfileContext";
 import PageLayout from "../PageLayout";
@@ -87,6 +88,11 @@ const CraftApplicationForm: React.FC = () => {
     }
   );
 
+  const saveDraftClickedHandler = useCallback(() => {
+    saveCurrentDraftApplication();
+    navigate("/");
+  }, [navigate]);
+
   return (
     <PageLayout>
       <h1 className="text-2xl font-black">Craft Fair Application Form</h1>
@@ -137,8 +143,8 @@ const CraftApplicationForm: React.FC = () => {
           return (
             <form onSubmit={formik.handleSubmit} className={"text-left"}>
               <LocalPersist
-                loadValuesFromStorage={getCurrentCraftApplication}
-                saveValuesToStorage={saveCurrentCraftApplication}
+                loadValuesFromStorage={getCurrentEditingApplication}
+                saveValuesToStorage={saveCurrentEditingApplication}
               />
 
               <h2 className="mt-4 text-2xl font-black">Trader Information</h2>
@@ -377,6 +383,10 @@ const CraftApplicationForm: React.FC = () => {
                 className="block m-auto my-4 p-4 bg-bfw-yellow hover:bg-bfw-link rounded text-lg text-menu-text"
               >
                 Submit Craft Fair Application
+              </button>
+
+              <button type="button" onClick={saveDraftClickedHandler}>
+                Save for later
               </button>
             </form>
           );

@@ -1,12 +1,22 @@
-import { Link } from "react-router-dom";
+import { useCallback } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { prepareNewDraft } from "../services/LocalApplicationsStore";
 import { useUserProfile } from "../services/UserProfileContext";
 import ApplicationsList from "./ApplicationsList";
+import DraftApplicationsList from "./DraftApplicationsList";
 import HomeLayout from "./HomeLayout";
 
 export interface WelcomeProps {}
 
-const Welcome: React.FC<WelcomeProps> = () => {
+const Home: React.FC<WelcomeProps> = () => {
   const { userProfile } = useUserProfile();
+  const navigate = useNavigate();
+
+  const newCraftApplicationHandler = useCallback(() => {
+    if (prepareNewDraft()) {
+      navigate("/craftApplication");
+    }
+  }, [navigate]);
 
   if (userProfile) {
     return (
@@ -24,10 +34,21 @@ const Welcome: React.FC<WelcomeProps> = () => {
           <h2 className="mt-4 text-xl ">Existing applications</h2>
           <ApplicationsList />
         </div>
+        <div className="text-left">
+          <h2 className="mt-4 text-xl ">
+            Draft applications stored on this device
+          </h2>
+          <DraftApplicationsList />
+        </div>
         <div className="mt-8">
-          <Link to="/craftApplication" className="m-4 underline">
-            Craft Fair Application
-          </Link>
+          <button
+            type="button"
+            onClick={newCraftApplicationHandler}
+            className="m-4 underline"
+          >
+            New Craft Fair Application
+          </button>
+
           <Link to="/cateringApplication" className="m-4 underline">
             Catering Application
           </Link>
@@ -50,10 +71,21 @@ const Welcome: React.FC<WelcomeProps> = () => {
             a new application by selecting the links below.
           </p>
         </div>
+        <div className="text-left">
+          <h2 className="mt-4 text-xl ">
+            Draft applications stored on this device
+          </h2>
+          <DraftApplicationsList />
+        </div>
+
         <div className="mt-8">
-          <Link to="/craftApplication" className="m-4 underline">
-            Craft Fair Application
-          </Link>
+          <button
+            type="button"
+            onClick={newCraftApplicationHandler}
+            className="m-4 underline"
+          >
+            New Craft Fair Application
+          </button>
           <Link to="/cateringApplication" className="m-4 underline">
             Catering Application
           </Link>
@@ -63,4 +95,4 @@ const Welcome: React.FC<WelcomeProps> = () => {
   }
 };
 
-export default Welcome;
+export default Home;
