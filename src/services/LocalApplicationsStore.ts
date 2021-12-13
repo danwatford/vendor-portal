@@ -3,6 +3,7 @@ import {
   initialCraftFairApplication,
   LocalCraftFairApplication,
 } from "../interfaces/Applications";
+import { getTotalCraftFairApplicationCost } from "./applications-pricing";
 
 const MAX_DRAFTS = 10;
 const DRAFTS_STORAGE_KEY = "vendorPortalDrafts";
@@ -103,6 +104,8 @@ export const saveCurrentEditingApplication = (
       craftApplication.pitchAdditionalWidth.toString()
     ),
   };
+
+  converted.totalCost = getTotalCraftFairApplicationCost(converted);
 
   window.localStorage.setItem(EDIT_STORAGE_KEY, JSON.stringify(converted));
 };

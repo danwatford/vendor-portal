@@ -7,6 +7,10 @@ import {
   ElectricalOption,
   PitchType,
 } from "../../interfaces/Applications";
+import {
+  getTablesCost,
+  getTotalCraftFairApplicationCost,
+} from "../../services/applications-pricing";
 import { saveCurrentDraftApplication } from "../../services/ApplicationsManager";
 import {
   getCurrentEditingApplication,
@@ -123,22 +127,8 @@ const CraftApplicationForm: React.FC = () => {
         }}
       >
         {(formik) => {
-          const selectedPitchType = formik.values.pitchType;
-          const pitchBaseCost = getPitchBaseCost(selectedPitchType);
-          const pitchAddionalWidthCost =
-            getPitchPerAdditionalMetreCost(selectedPitchType) *
-            formik.values.pitchAdditionalWidth;
-          const pitchElectricalCosts = getPitchElectricalOptionsCost(
-            formik.values.pitchElectricalOptions
-          );
-
-          const totalTablesCost = 12 * formik.values.tables;
-
-          const totalCost =
-            pitchBaseCost +
-            pitchAddionalWidthCost +
-            pitchElectricalCosts +
-            totalTablesCost;
+          const totalTablesCost = getTablesCost(formik.values);
+          const totalCost = getTotalCraftFairApplicationCost(formik.values);
 
           return (
             <form onSubmit={formik.handleSubmit} className={"text-left"}>
