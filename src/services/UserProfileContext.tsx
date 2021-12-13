@@ -25,9 +25,8 @@ const UserProfileContextProvider = ({
     const run = async () => {
       try {
         const res = await fetch("/api/profile");
-        const json: UserProfile = await res.json();
-        if (json) {
-          setUserProfile(json);
+        if (res.ok) {
+          setUserProfile(await res.json());
         }
       } catch (e) {
         if (window.location.hostname === "localhost") {
@@ -35,7 +34,7 @@ const UserProfileContextProvider = ({
             "Can't access the profile endpoint. For local development, please use the Static Web Apps CLI to emulate authentication: https://github.com/azure/static-web-apps-cli"
           );
         } else {
-          console.error(`Failed to unpack JSON.`, e);
+          console.error(`Failed to unpack user profile from JSON.`, e);
         }
       }
 
