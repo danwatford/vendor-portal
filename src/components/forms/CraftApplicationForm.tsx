@@ -375,7 +375,11 @@ const CraftApplicationForm: React.FC = () => {
                 Submit Craft Fair Application
               </button>
 
-              <button type="button" onClick={saveDraftClickedHandler}>
+              <button
+                type="button"
+                onClick={saveDraftClickedHandler}
+                className="m-4 underline"
+              >
                 Save for later
               </button>
             </form>

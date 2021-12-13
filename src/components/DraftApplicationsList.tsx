@@ -22,12 +22,14 @@ const DraftApplicationsList: React.FC = () => {
         key={index}
         onClick={() => clickHandler(index)}
         className={
-          "p-2 " + (index % 2 === 0 ? "bg-yellow-50" : "bg-yellow-100")
+          "p-2 " +
+          (index % 2 === 0 ? "bg-yellow-50" : "bg-yellow-100") +
+          " hover:bg-yellow-200 cursor-pointer"
         }
       >
         <span className="block">{application.tradingName}</span>
         <span>Saved: {application.lastSaved}</span>
-        <span>Total: {application.totalCost}</span>
+        <span>Total: £{application.totalCost}</span>
       </div>
     );
   });
