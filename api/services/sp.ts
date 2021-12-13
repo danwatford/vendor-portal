@@ -23,7 +23,7 @@ export const createItem = async <T>(
 ): Promise<IItemAddResult> => {
   const web = Web(site);
   const list = web.lists.getById(listGuid);
-  return list.items.add(item);
+  return list.usingCaching().items.add(item);
 };
 
 export const updateItem = async <T extends ListItem>(
@@ -33,7 +33,7 @@ export const updateItem = async <T extends ListItem>(
 ): Promise<IItemUpdateResult> => {
   const web = Web(site);
   const list = web.lists.getById(listGuid);
-  return list.items.getById(item.ID).update(item);
+  return list.usingCaching().items.getById(item.ID).update(item);
 };
 
 const getPagedItemsdByFilter = async <T>(
