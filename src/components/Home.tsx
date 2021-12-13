@@ -2,9 +2,9 @@ import { useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { prepareNewDraft } from "../services/LocalApplicationsStore";
 import { useUserProfile } from "../services/UserProfileContext";
-import ApplicationsList from "./ApplicationsList";
-import DraftApplicationsList from "./DraftApplicationsList";
+import DraftApplicationsPanel from "./DraftApplicationsPanel";
 import HomeLayout from "./HomeLayout";
+import SubmittedApplicationsPanel from "./SubmittedApplicationsPanel";
 
 export interface WelcomeProps {}
 
@@ -30,16 +30,8 @@ const Home: React.FC<WelcomeProps> = () => {
             Week 2022.
           </p>
         </div>
-        <div className="text-left">
-          <h2 className="mt-4 text-xl ">Existing applications</h2>
-          <ApplicationsList />
-        </div>
-        <div className="text-left">
-          <h2 className="mt-4 text-xl ">
-            Draft applications stored on this device
-          </h2>
-          <DraftApplicationsList />
-        </div>
+        <SubmittedApplicationsPanel />
+        <DraftApplicationsPanel />
         <div className="mt-8">
           <button
             type="button"
@@ -71,12 +63,7 @@ const Home: React.FC<WelcomeProps> = () => {
             a new application by selecting the links below.
           </p>
         </div>
-        <div className="text-left">
-          <h2 className="mt-4 text-xl ">
-            Draft applications stored on this device
-          </h2>
-          <DraftApplicationsList />
-        </div>
+        <DraftApplicationsPanel />
 
         <div className="mt-8">
           <button

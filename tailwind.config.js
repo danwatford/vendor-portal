@@ -25,7 +25,10 @@ module.exports = {
     },
   },
   variants: {
-    extend: {},
+    extend: {
+      backgroundColor: ["odd", "even", "first", "last"],
+      borderRadius: ["first", "last"],
+    },
   },
   plugins: [require("@tailwindcss/forms")],
 };
