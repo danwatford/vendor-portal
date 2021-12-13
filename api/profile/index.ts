@@ -7,8 +7,18 @@ const httpTrigger: AzureFunction = async function (
 ): Promise<void> {
   const user = await getUserFromCookie(req.headers.cookie);
 
-  context.res.body = user;
-  context.res.type("application/json");
+  if (user) {
+    context.res = {
+      status: 200,
+      body: user,
+      headers: { "Content-Type": "application/json" },
+    };
+  } else {
+    context.res = {
+      status: 401,
+      body: "User must be signed in before retrieving their profile.",
+    };
+  }
 };
 
 export default httpTrigger;
