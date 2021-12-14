@@ -1,15 +1,18 @@
 import { Field, Formik } from "formik";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import {
-  CraftFairApplicationWithContact,
-  ElectricalOption,
-  PitchType,
+  initialCraftFairApplication,
+  LocalCraftFairApplication,
+  SubmittedCraftFairApplication,
 } from "../../interfaces/Applications";
 import {
   getTablesCost,
   getTotalCraftFairApplicationCost,
+  pitchAdditionalWidthCost,
+  pitchBaseCost,
+  pitchEletricalOptionCost,
 } from "../../services/applications-pricing";
 import { saveCurrentDraftApplication } from "../../services/ApplicationsManager";
 import {
@@ -22,75 +25,13 @@ import { AddressField, PitchSelection, TextArea, TextInput } from "./Fields";
 import LocalPersist from "./LocalPersist";
 import { CraftFairApplicationValidationSchema } from "./ValidationSchemas";
 
-const getPitchBaseCost = (pitchType: PitchType) => {
-  switch (pitchType) {
-    case "standardNoShelter":
-      return 460;
-    case "extraLargeNoShelter":
-      return 560;
-    case "standardInMarquee":
-      return 480;
-    case "doubleInMarquee":
-      return 940;
-  }
-};
-
-const getPitchPerAdditionalMetreCost = (pitchType: PitchType) => {
-  switch (pitchType) {
-    case "standardNoShelter":
-      return 140;
-    case "extraLargeNoShelter":
-      return 150;
-    case "standardInMarquee":
-      return 0;
-    case "doubleInMarquee":
-      return 0;
-  }
-};
-
-const getPitchElectricalOptionsCost = (electricalOption: ElectricalOption) => {
-  switch (electricalOption) {
-    case "none":
-      return 0;
-    case "1 x 13amp socket":
-      return 60;
-    case "1 x 16amp socket":
-      return 60;
-    case "2 x 13amp socket":
-      return 70;
-    case "1 x 32amp supply":
-      return 90;
-  }
-};
+export interface CraftApplicationFormProps {
+  initialValues: LocalCraftFairApplication | SubmittedCraftFairApplication;
+}
 
 const CraftApplicationForm: React.FC = () => {
   const { userProfile } = useUserProfile();
   const navigate = useNavigate();
-
-  const [formValues, setFormValues] = useState<CraftFairApplicationWithContact>(
-    {
-      contactFirstNames: "",
-      contactLastName: "",
-      tradingName: "",
-      addressLine1: "",
-      addressLine2: "",
-      city: "",
-      state: "",
-      postcode: "",
-      country: "United Kingdom",
-      landline: "",
-      mobile: "",
-      email: "",
-      descriptionOfStall: "",
-      pitchType: "standardNoShelter",
-      pitchAdditionalWidth: 0,
-      pitchVanSpaceRequired: false,
-      pitchElectricalOptions: "none",
-      campingRequired: false,
-      tables: 0,
-      totalCost: 0,
-    }
-  );
 
   const saveDraftClickedHandler = useCallback(() => {
     saveCurrentDraftApplication();
@@ -101,13 +42,12 @@ const CraftApplicationForm: React.FC = () => {
     <PageLayout>
       <h1 className="text-2xl font-black">Craft Fair Application Form</h1>
       <Formik
-        initialValues={formValues}
+        initialValues={initialCraftFairApplication}
         validationSchema={Yup.object({
           ...CraftFairApplicationValidationSchema,
         })}
         onSubmit={(values, { setSubmitting }) => {
           if (userProfile) {
-            setFormValues(values);
             navigate("/submittingCraftApplication");
             setSubmitting(false);
           } else {
@@ -173,12 +113,12 @@ const CraftApplicationForm: React.FC = () => {
                 <PitchSelection
                   name="pitchType"
                   value="standardNoShelter"
-                  price={getPitchBaseCost("standardNoShelter")}
+                  price={pitchBaseCost["standardNoShelter"]}
                   label="Standard 3m wide x 3m deep pitch"
                   description="(approx. 10ft x 10ft)"
-                  additionalWidthPerMetrePrice={getPitchPerAdditionalMetreCost(
-                    "standardNoShelter"
-                  )}
+                  additionalWidthPerMetrePrice={
+                    pitchAdditionalWidthCost["standardNoShelter"]
+                  }
                   additionalWidthDescription="If you require a pitch width bigger 
                 than 3m, you can add extra at 
                 £140 per metre. "
@@ -186,15 +126,15 @@ const CraftApplicationForm: React.FC = () => {
                 <PitchSelection
                   name="pitchType"
                   value="extraLargeNoShelter"
-                  price={getPitchBaseCost("extraLargeNoShelter")}
+                  price={pitchBaseCost["extraLargeNoShelter"]}
                   label="Extra-large 4.5m wide x 3m deep pitch"
                   description="(approx. 15ft x 10ft)"
                   description2="Vehicle space behind. No motorhomes or 
                 caravans. Vehicles cannot be moved off site 
                 during the week."
-                  additionalWidthPerMetrePrice={getPitchPerAdditionalMetreCost(
-                    "extraLargeNoShelter"
-                  )}
+                  additionalWidthPerMetrePrice={
+                    pitchAdditionalWidthCost["extraLargeNoShelter"]
+                  }
                   additionalWidthDescription="If you require a pitch width bigger 
                 than 3m, you can add extra at 
                 £150 per metre. "
@@ -216,14 +156,14 @@ const CraftApplicationForm: React.FC = () => {
                 <PitchSelection
                   name="pitchType"
                   value="standardInMarquee"
-                  price={getPitchBaseCost("standardInMarquee")}
+                  price={pitchBaseCost["standardInMarquee"]}
                   label="Standard 3m wide x 3m deep pitch"
                   description="(approx. 10ft x 10ft)"
                 />
                 <PitchSelection
                   name="pitchType"
                   value="doubleInMarquee"
-                  price={getPitchBaseCost("doubleInMarquee")}
+                  price={pitchBaseCost["doubleInMarquee"]}
                   label="Double Width 6m wide x 3m deep pitch"
                   description="(approx. 20ft x 10ft)"
                   description2="Marquee support legs are every 3m"
@@ -262,35 +202,35 @@ const CraftApplicationForm: React.FC = () => {
               <PitchSelection
                 name="pitchElectricalOptions"
                 value="none"
-                price={getPitchElectricalOptionsCost("none")}
+                price={pitchEletricalOptionCost["none"]}
                 label="No additional electricity supply required."
               ></PitchSelection>
 
               <PitchSelection
                 name="pitchElectricalOptions"
                 value="1 x 13amp socket"
-                price={getPitchElectricalOptionsCost("1 x 13amp socket")}
+                price={pitchEletricalOptionCost["1 x 13amp socket"]}
                 label="1 x 13amp socket @ 1kw of power direct to your stall."
               ></PitchSelection>
 
               <PitchSelection
                 name="pitchElectricalOptions"
                 value="1 x 16amp socket"
-                price={getPitchElectricalOptionsCost("1 x 16amp socket")}
+                price={pitchEletricalOptionCost["1 x 16amp socket"]}
                 label="1 x 16amp socket @ 1kw of power direct to your stall."
               ></PitchSelection>
 
               <PitchSelection
                 name="pitchElectricalOptions"
                 value="2 x 13amp socket"
-                price={getPitchElectricalOptionsCost("2 x 13amp socket")}
+                price={pitchEletricalOptionCost["2 x 13amp socket"]}
                 label="2 x 13amp socket @ 1kw of power direct to your stall."
               ></PitchSelection>
 
               <PitchSelection
                 name="pitchElectricalOptions"
                 value="1 x 32amp supply"
-                price={getPitchElectricalOptionsCost("1 x 32amp supply")}
+                price={pitchEletricalOptionCost["1 x 32amp supply"]}
                 label="1 x 32amp supply @ 1kw of power direct to your stall."
               ></PitchSelection>
 

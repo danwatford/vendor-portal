@@ -1,35 +1,24 @@
 import {
-  CraftFairApplicationWithContact,
+  isLocalCraftFairApplication,
+  isSubmittedCraftFairApplication,
   LocalCraftFairApplication,
+  SubmittedCraftFairApplication,
 } from "../interfaces/Applications";
 
-type Appl<
-  T extends LocalCraftFairApplication | CraftFairApplicationWithContact
-> = T extends LocalCraftFairApplication
-  ? LocalCraftFairApplication
-  : CraftFairApplicationWithContact;
-
-function isLocalCraftFairApplication(
-  application: LocalCraftFairApplication | CraftFairApplicationWithContact
-): application is LocalCraftFairApplication {
-  return (application as LocalCraftFairApplication).draftId !== undefined;
-}
-
-function isCraftFairApplicationWithContact(
-  application: LocalCraftFairApplication | CraftFairApplicationWithContact
-): application is CraftFairApplicationWithContact {
-  return (application as CraftFairApplicationWithContact).dbId !== undefined;
-}
+type Appl<T extends LocalCraftFairApplication | SubmittedCraftFairApplication> =
+  T extends LocalCraftFairApplication
+    ? LocalCraftFairApplication
+    : SubmittedCraftFairApplication;
 
 export interface ApplicationListItemProps<
-  T extends LocalCraftFairApplication | CraftFairApplicationWithContact
+  T extends LocalCraftFairApplication | SubmittedCraftFairApplication
 > {
   application: Appl<T>;
   clickHandler: (application: Appl<T>) => void;
 }
 
 const ApplicationListItem = <
-  T extends LocalCraftFairApplication | CraftFairApplicationWithContact
+  T extends LocalCraftFairApplication | SubmittedCraftFairApplication
 >({
   application,
   clickHandler,
@@ -37,7 +26,7 @@ const ApplicationListItem = <
   let timestampComponent;
   if (isLocalCraftFairApplication(application)) {
     timestampComponent = <span>Saved: {application.lastSaved}</span>;
-  } else if (isCraftFairApplicationWithContact(application)) {
+  } else if (isSubmittedCraftFairApplication(application)) {
     timestampComponent = <span>Submitted: {application.created}</span>;
   }
 

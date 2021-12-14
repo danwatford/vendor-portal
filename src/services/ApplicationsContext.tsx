@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import { CraftFairApplicationWithContact } from "../interfaces/Applications";
+import { SubmittedCraftFairApplication } from "../interfaces/Applications";
 import {
   getApplications,
   isRefreshingApplications,
@@ -10,7 +10,7 @@ import { useUserProfile } from "./UserProfileContext";
 
 export type IApplicationsContext = {
   loaded: boolean;
-  applications: CraftFairApplicationWithContact[];
+  applications: SubmittedCraftFairApplication[];
   refreshApplications: () => void;
 };
 
@@ -31,7 +31,7 @@ const ApplicationsContextProvider = ({
 }) => {
   const { userProfile } = useUserProfile();
   const [applications, setApplications] = useState<
-    CraftFairApplicationWithContact[]
+    SubmittedCraftFairApplication[]
   >(() => getApplications());
   const [loaded, setLoaded] = useState(() => !isRefreshingApplications());
 

@@ -1,7 +1,9 @@
 import {
   CraftFairApplication,
   initialCraftFairApplication,
+  isSubmittedCraftFairApplication,
   LocalCraftFairApplication,
+  SubmittedCraftFairApplication,
 } from "../interfaces/Applications";
 import { getTotalCraftFairApplicationCost } from "./applications-pricing";
 
@@ -59,8 +61,8 @@ export const saveCurrentEditingApplicationAsDraft = () => {
     throw new Error("Attempted to save a missing application to drafts.");
   }
 
-  // Don't save applications to drafts if they have previously been submitted, i.e. they already have a database ID.
-  if (currentEditingApplication?.dbId) {
+  // Don't save applications to drafts if they have previously been submitted.
+  if (isSubmittedCraftFairApplication(currentEditingApplication)) {
     throw new Error(
       "Attempted to save a previously submitted application to drafts storage."
     );
@@ -80,20 +82,22 @@ export const clearDraft = (draftId: number) => {
 };
 
 // Retrieve the application from the edit storage area.
-export const getCurrentEditingApplication =
-  (): LocalCraftFairApplication | null => {
-    const savedForm = window.localStorage.getItem(EDIT_STORAGE_KEY);
+export const getCurrentEditingApplication = ():
+  | LocalCraftFairApplication
+  | SubmittedCraftFairApplication
+  | null => {
+  const savedForm = window.localStorage.getItem(EDIT_STORAGE_KEY);
 
-    if (savedForm) {
-      return JSON.parse(savedForm);
-    } else {
-      return null;
-    }
-  };
+  if (savedForm) {
+    return JSON.parse(savedForm);
+  } else {
+    return null;
+  }
+};
 
 // Save the given application to the edit storage area.
 export const saveCurrentEditingApplication = (
-  craftApplication: LocalCraftFairApplication
+  craftApplication: LocalCraftFairApplication | SubmittedCraftFairApplication
 ) => {
   // The tables and additional width properties of the CraftFairApplication should be numbers, but the Formik select
   // field used to edit the properties sets them to text. Convert to a number before writing to storage.

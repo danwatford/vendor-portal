@@ -35,9 +35,15 @@ export type CraftFairApplication = {
   campingRequired: boolean;
   tables: number;
   totalCost: number;
-  dbId?: number;
-  created?: string;
 };
+
+export type SubmittedApplication = {
+  dbId: number;
+  created: string;
+};
+
+export type SubmittedCraftFairApplication = SubmittedApplication &
+  CraftFairApplication;
 
 export type LocalCraftFairApplication = CraftFairApplication & {
   draftId: number;
@@ -66,3 +72,15 @@ export const initialCraftFairApplication: CraftFairApplication = {
   tables: 0,
   totalCost: 0,
 };
+
+export function isLocalCraftFairApplication(
+  application: LocalCraftFairApplication | SubmittedCraftFairApplication
+): application is LocalCraftFairApplication {
+  return (application as LocalCraftFairApplication).draftId !== undefined;
+}
+
+export function isSubmittedCraftFairApplication(
+  application: LocalCraftFairApplication | SubmittedCraftFairApplication
+): application is SubmittedCraftFairApplication {
+  return (application as SubmittedCraftFairApplication).dbId !== undefined;
+}

@@ -4,21 +4,23 @@ import {
   PitchType,
 } from "../interfaces/Applications";
 
-const pitchBaseCost: Readonly<Record<PitchType, number>> = {
+export const pitchBaseCost: Readonly<Record<PitchType, number>> = {
   standardNoShelter: 460,
   extraLargeNoShelter: 560,
   standardInMarquee: 480,
   doubleInMarquee: 940,
 };
 
-const pitchAdditionalWidthCost: Readonly<Record<PitchType, number>> = {
+export const pitchAdditionalWidthCost: Readonly<Record<PitchType, number>> = {
   standardNoShelter: 140,
   extraLargeNoShelter: 150,
   standardInMarquee: 0,
   doubleInMarquee: 0,
 };
 
-const pitchEletricalOptionCost: Readonly<Record<ElectricalOption, number>> = {
+export const pitchEletricalOptionCost: Readonly<
+  Record<ElectricalOption, number>
+> = {
   none: 0,
   "1 x 13amp socket": 60,
   "1 x 16amp socket": 60,

@@ -1,4 +1,7 @@
-import { CraftFairApplicationWithContact } from "../interfaces/Applications";
+import {
+  isLocalCraftFairApplication,
+  SubmittedCraftFairApplication,
+} from "../interfaces/Applications";
 import {
   clearCurrentEditingApplication,
   clearDraft,
@@ -8,7 +11,7 @@ import {
 
 const applicationListSubscribers: Array<() => void> = [];
 let refreshingApplications = false;
-let applications: Array<CraftFairApplicationWithContact> = [];
+let applications: Array<SubmittedCraftFairApplication> = [];
 
 export const subscribeApplicationListChange = (subscriber: () => void) => {
   applicationListSubscribers.push(subscriber);
@@ -25,7 +28,7 @@ export const refreshApplicationsList = async () => {
   notifyApplicationListChangeSubscribers();
   try {
     const res = await fetch("/api/getApplications");
-    const json: CraftFairApplicationWithContact[] = await res.json();
+    const json: SubmittedCraftFairApplication[] = await res.json();
     if (json) {
       applications = json;
     }
@@ -56,8 +59,7 @@ export const submitCurrentCraftApplication = async (): Promise<void> => {
 
   const submitResponse = await fetch("/api/submitCraftApplication", options);
   if (submitResponse.status === 200) {
-    // Was the submitted application a draft application, or did it already have a database ID?
-    if (!currentCraftApplication.dbId) {
+    if (isLocalCraftFairApplication(currentCraftApplication)) {
       // Application was a draft. Now it has been successfully submitted it should be removed from
       // the drafts storage.
       clearDraft(currentCraftApplication.draftId);
