@@ -46,7 +46,7 @@ function ScrollToFieldError<T>() {
     if (fieldErrorNames.length <= 0) return;
 
     const element = document.querySelector(
-      `input[name='${fieldErrorNames[0]}']`
+      `input[name='${fieldErrorNames[0]}'], textarea[name='${fieldErrorNames[0]}']`
     );
     if (!element) return;
 
