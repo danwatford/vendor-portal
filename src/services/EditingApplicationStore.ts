@@ -1,5 +1,5 @@
 import {
-  LocalCraftFairApplication,
+  DraftCraftFairApplication,
   SubmittedCraftFairApplication,
 } from "../interfaces/Applications";
 import { getTotalCraftFairApplicationCost } from "./applications-pricing";
@@ -7,7 +7,7 @@ import { getTotalCraftFairApplicationCost } from "./applications-pricing";
 const EDIT_STORAGE_KEY = "vendorPortalEdit";
 
 type EditingApplication =
-  | LocalCraftFairApplication
+  | DraftCraftFairApplication
   | SubmittedCraftFairApplication;
 
 // Save the given application to the edit storage area.

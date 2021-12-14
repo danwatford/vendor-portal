@@ -1,5 +1,5 @@
 import {
-  isLocalCraftFairApplication,
+  isDraftCraftFairApplication,
   SubmittedCraftFairApplication,
 } from "../interfaces/Applications";
 import {
@@ -55,7 +55,7 @@ export const submitEditingApplication = async (): Promise<void> => {
 
   const submitResponse = await fetch("/api/submitCraftApplication", options);
   if (submitResponse.status === 200) {
-    if (isLocalCraftFairApplication(currentCraftApplication)) {
+    if (isDraftCraftFairApplication(currentCraftApplication)) {
       // Application was a draft. Now it has been successfully submitted it should be removed from
       // the drafts storage.
       removeDraft(currentCraftApplication.draftId);

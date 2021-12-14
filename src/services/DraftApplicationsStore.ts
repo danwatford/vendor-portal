@@ -1,4 +1,4 @@
-import { LocalCraftFairApplication } from "../interfaces/Applications";
+import { DraftCraftFairApplication } from "../interfaces/Applications";
 
 const MAX_DRAFTS = 10;
 const DRAFTS_STORAGE_KEY = "vendorPortalDrafts";
@@ -14,7 +14,7 @@ export const getAvailableDraftId = (): number | null => {
 };
 
 export const getDraftsFromStore =
-  (): Array<LocalCraftFairApplication | null> => {
+  (): Array<DraftCraftFairApplication | null> => {
     const storedItem = window.localStorage.getItem(DRAFTS_STORAGE_KEY);
     if (storedItem) {
       return JSON.parse(storedItem);
@@ -32,16 +32,16 @@ export const clearDraftFromStore = (draftId: number) => {
   storeDrafts(drafts);
 };
 
-export const writeDraftToStore = (application: LocalCraftFairApplication) => {
+export const writeDraftToStore = (application: DraftCraftFairApplication) => {
   const currentDateTime = new Date();
   application.lastSaved = currentDateTime.toLocaleString();
 
-  const drafts: Array<LocalCraftFairApplication | null> = getDraftsFromStore();
+  const drafts: Array<DraftCraftFairApplication | null> = getDraftsFromStore();
   let index = application.draftId;
   drafts[index] = application;
   storeDrafts(drafts);
 };
 
-const storeDrafts = (drafts: Array<LocalCraftFairApplication | null>) => {
+const storeDrafts = (drafts: Array<DraftCraftFairApplication | null>) => {
   window.localStorage.setItem(DRAFTS_STORAGE_KEY, JSON.stringify(drafts));
 };

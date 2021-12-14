@@ -1,57 +1,97 @@
-export type PitchType =
-  | "standardNoShelter"
-  | "extraLargeNoShelter"
-  | "standardInMarquee"
-  | "doubleInMarquee";
+import {
+  Boolean,
+  Number,
+  String,
+  Literal,
+  Record,
+  Union,
+  Static,
+  Optional,
+} from "runtypes";
 
-export type ElectricalOption =
-  | "none"
-  | "1 x 13amp socket"
-  | "1 x 16amp socket"
-  | "2 x 13amp socket"
-  | "1 x 32amp supply";
+export const ApplicationStatusRunType = Union(
+  Literal("Pending Deposit"),
+  Literal("Pending Document Upload"),
+  Literal("Processing"),
+  Literal("Rejected"),
+  Literal("Accepted Pending Payment"),
+  Literal("Accepted")
+);
 
-export type VendorContact = {
-  contactFirstNames: string;
-  contactLastName: string;
-  email: string;
-};
+export const PitchTypeRunType = Union(
+  Literal("standardNoShelter"),
+  Literal("extraLargeNoShelter"),
+  Literal("standardInMarquee"),
+  Literal("doubleInMarquee")
+);
 
-export type CraftFairApplication = {
-  tradingName: string;
-  addressLine1: string;
-  addressLine2: string;
-  city: string;
-  state: string;
-  postcode: string;
-  country: string;
-  landline: string;
-  mobile: string;
-  descriptionOfStall: string;
-  pitchType: PitchType;
-  pitchAdditionalWidth: number;
-  pitchVanSpaceRequired: boolean;
-  pitchElectricalOptions: ElectricalOption;
-  campingRequired: boolean;
-  tables: number;
-  totalCost: number;
-};
+export const ElectricalOptionRunType = Union(
+  Literal("none"),
+  Literal("1 x 13amp socket"),
+  Literal("1 x 16amp socket"),
+  Literal("2 x 13amp socket"),
+  Literal("1 x 32amp supply")
+);
 
-export type SubmittedApplication = {
-  dbId: number;
-  created: string;
-};
+export const VendorContactRunType = Record({
+  userId: String,
+  contactFirstNames: String,
+  contactLastName: String,
+  email: String,
+});
 
-export type SubmittedCraftFairApplication = SubmittedApplication &
-  CraftFairApplication;
+export const CraftFairApplicationRunType = Record({
+  tradingName: String,
+  addressLine1: String,
+  addressLine2: String,
+  city: String,
+  state: String,
+  postcode: String,
+  country: String,
+  landline: String,
+  mobile: String,
+  descriptionOfStall: String,
+  pitchType: PitchTypeRunType,
+  pitchAdditionalWidth: Number,
+  pitchVanSpaceRequired: Boolean,
+  pitchElectricalOptions: ElectricalOptionRunType,
+  campingRequired: Boolean,
+  tables: Number,
+  totalCost: Optional(Number),
+});
 
-export type LocalCraftFairApplication = CraftFairApplication & {
-  draftId: number;
-  lastSaved?: string;
-};
+export const DraftCraftFairApplicationRunType = CraftFairApplicationRunType.And(
+  Record({
+    draftId: Number,
+    lastSaved: String,
+  })
+);
 
-export type CraftFairApplicationWithContact = VendorContact &
-  CraftFairApplication;
+export const SubmittedCraftFairApplicationRunType =
+  CraftFairApplicationRunType.And(
+    Record({
+      dbId: Number,
+      status: ApplicationStatusRunType,
+      userId: String,
+      contactFirstNames: String,
+      contactLastName: String,
+      email: String,
+      created: String,
+    })
+  );
+
+export type PitchType = Static<typeof PitchTypeRunType>;
+export type ElectricalOption = Static<typeof ElectricalOptionRunType>;
+export type VendorContact = Static<typeof VendorContactRunType>;
+export type ApplicationStatus = Static<typeof ApplicationStatusRunType>;
+
+export type CraftFairApplication = Static<typeof CraftFairApplicationRunType>;
+export type DraftCraftFairApplication = Static<
+  typeof DraftCraftFairApplicationRunType
+>;
+export type SubmittedCraftFairApplication = Static<
+  typeof SubmittedCraftFairApplicationRunType
+>;
 
 export const initialCraftFairApplication: CraftFairApplication = {
   tradingName: "",
@@ -73,14 +113,14 @@ export const initialCraftFairApplication: CraftFairApplication = {
   totalCost: 0,
 };
 
-export function isLocalCraftFairApplication(
-  application: LocalCraftFairApplication | SubmittedCraftFairApplication
-): application is LocalCraftFairApplication {
-  return (application as LocalCraftFairApplication).draftId !== undefined;
+export function isDraftCraftFairApplication(
+  application: DraftCraftFairApplication | SubmittedCraftFairApplication
+): application is DraftCraftFairApplication {
+  return (application as DraftCraftFairApplication).draftId !== undefined;
 }
 
 export function isSubmittedCraftFairApplication(
-  application: LocalCraftFairApplication | SubmittedCraftFairApplication
+  application: DraftCraftFairApplication | SubmittedCraftFairApplication
 ): application is SubmittedCraftFairApplication {
   return (application as SubmittedCraftFairApplication).dbId !== undefined;
 }

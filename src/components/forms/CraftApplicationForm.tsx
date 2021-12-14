@@ -3,8 +3,8 @@ import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import {
-  isLocalCraftFairApplication,
-  LocalCraftFairApplication,
+  isDraftCraftFairApplication,
+  DraftCraftFairApplication,
   SubmittedCraftFairApplication,
 } from "../../interfaces/Applications";
 import {
@@ -27,7 +27,7 @@ import ScrollToFieldError from "./ScrollToFieldError";
 import { CraftFairApplicationValidationSchema } from "./ValidationSchemas";
 
 export interface CraftApplicationFormProps {
-  initialValues: LocalCraftFairApplication | SubmittedCraftFairApplication;
+  initialValues: DraftCraftFairApplication | SubmittedCraftFairApplication;
 }
 
 const CraftApplicationForm: React.FC = () => {
@@ -35,7 +35,7 @@ const CraftApplicationForm: React.FC = () => {
   const [errorDescription, setErrorDescription] = useState<string>("");
 
   const [initialValues] = useState<
-    LocalCraftFairApplication | SubmittedCraftFairApplication | undefined
+    DraftCraftFairApplication | SubmittedCraftFairApplication | undefined
   >(() => {
     const currentApplication = loadFromEditingApplicationStore();
     if (!currentApplication) {
@@ -98,7 +98,7 @@ const CraftApplicationForm: React.FC = () => {
           const totalTablesCost = getTablesCost(formik.values);
           const totalCost = getTotalCraftFairApplicationCost(formik.values);
 
-          const saveAsDraftComponent = isLocalCraftFairApplication(
+          const saveAsDraftComponent = isDraftCraftFairApplication(
             formik.values
           ) ? (
             <button

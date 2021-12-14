@@ -1,7 +1,7 @@
 import {
   initialCraftFairApplication,
   isSubmittedCraftFairApplication,
-  LocalCraftFairApplication,
+  DraftCraftFairApplication,
 } from "../interfaces/Applications";
 import {
   clearDraftFromStore,
@@ -31,6 +31,7 @@ export const prepareNewDraftForEditing = (): boolean => {
     saveToEditingApplicationStore({
       ...initialCraftFairApplication,
       draftId,
+      lastSaved: "",
     });
     return true;
   } else {
@@ -77,7 +78,7 @@ export const removeDraft = (draftId: number) => {
   notifyDraftApplicationListChangeSubscribers();
 };
 
-const updateDraft = (application: LocalCraftFairApplication) => {
+const updateDraft = (application: DraftCraftFairApplication) => {
   const currentDateTime = new Date();
   application.lastSaved = currentDateTime.toLocaleString();
 

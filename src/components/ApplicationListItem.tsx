@@ -1,30 +1,30 @@
 import {
-  isLocalCraftFairApplication,
+  isDraftCraftFairApplication,
   isSubmittedCraftFairApplication,
-  LocalCraftFairApplication,
+  DraftCraftFairApplication,
   SubmittedCraftFairApplication,
 } from "../interfaces/Applications";
 
-type Appl<T extends LocalCraftFairApplication | SubmittedCraftFairApplication> =
-  T extends LocalCraftFairApplication
-    ? LocalCraftFairApplication
+type Appl<T extends DraftCraftFairApplication | SubmittedCraftFairApplication> =
+  T extends DraftCraftFairApplication
+    ? DraftCraftFairApplication
     : SubmittedCraftFairApplication;
 
 export interface ApplicationListItemProps<
-  T extends LocalCraftFairApplication | SubmittedCraftFairApplication
+  T extends DraftCraftFairApplication | SubmittedCraftFairApplication
 > {
   application: Appl<T>;
   clickHandler: (application: Appl<T>) => void;
 }
 
 const ApplicationListItem = <
-  T extends LocalCraftFairApplication | SubmittedCraftFairApplication
+  T extends DraftCraftFairApplication | SubmittedCraftFairApplication
 >({
   application,
   clickHandler,
 }: ApplicationListItemProps<T>): JSX.Element => {
   let timestampComponent;
-  if (isLocalCraftFairApplication(application)) {
+  if (isDraftCraftFairApplication(application)) {
     timestampComponent = <span>Saved: {application.lastSaved}</span>;
   } else if (isSubmittedCraftFairApplication(application)) {
     timestampComponent = <span>Submitted: {application.created}</span>;

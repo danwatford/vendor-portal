@@ -1,12 +1,12 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import { LocalCraftFairApplication } from "../interfaces/Applications";
+import { DraftCraftFairApplication } from "../interfaces/Applications";
 import {
   getDrafts,
   subscribeDraftApplicationListChange,
 } from "./DraftApplicationsManager";
 
 export type IDraftApplicationsContext = {
-  draftApplications: LocalCraftFairApplication[];
+  draftApplications: DraftCraftFairApplication[];
 };
 
 const DraftApplicationsContext = React.createContext<IDraftApplicationsContext>(
@@ -25,7 +25,7 @@ const DraftApplicationsContextProvider = ({
   children: JSX.Element;
 }) => {
   const [draftApplications, setDraftApplications] = useState<
-    LocalCraftFairApplication[]
+    DraftCraftFairApplication[]
   >([]);
 
   const getDraftApplications = useCallback(() => {
