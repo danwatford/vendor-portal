@@ -36,7 +36,11 @@ export const getTotalCraftFairApplicationCost = (
   const electricalCost =
     pitchEletricalOptionCost[application.pitchElectricalOptions];
 
+  const campingCost = application.campingRequired ? 60 : 0;
+
   const tablesCost = 12 * application.tables;
 
-  return baseCost + addionalWidthCost + electricalCost + tablesCost;
+  return (
+    baseCost + addionalWidthCost + electricalCost + campingCost + tablesCost
+  );
 };
