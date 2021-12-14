@@ -2,16 +2,23 @@ import React, { useCallback, useContext, useEffect, useState } from "react";
 import { DraftCraftFairApplication } from "../interfaces/Applications";
 import {
   getDrafts,
+  removeDraft,
   subscribeDraftApplicationListChange,
 } from "./DraftApplicationsManager";
 
 export type IDraftApplicationsContext = {
   draftApplications: DraftCraftFairApplication[];
+  deleteApplication: (application: DraftCraftFairApplication) => void;
 };
 
 const DraftApplicationsContext = React.createContext<IDraftApplicationsContext>(
   {
     draftApplications: [],
+    deleteApplication: () => {
+      throw new Error(
+        "DraftApplicationsContext consumer is not wrapped in a corresponding provider."
+      );
+    },
   }
 );
 
@@ -34,6 +41,13 @@ const DraftApplicationsContextProvider = ({
     setDraftApplications(filteredDrafts);
   }, []);
 
+  const deleteApplication = useCallback(
+    (application: DraftCraftFairApplication) => {
+      removeDraft(application.draftId);
+    },
+    []
+  );
+
   const draftApplicationsListChangeHandler = useCallback(() => {
     getDraftApplications();
   }, [getDraftApplications]);
@@ -45,7 +59,9 @@ const DraftApplicationsContextProvider = ({
   useEffect(getDraftApplications, [getDraftApplications]);
 
   return (
-    <DraftApplicationsContext.Provider value={{ draftApplications }}>
+    <DraftApplicationsContext.Provider
+      value={{ draftApplications, deleteApplication }}
+    >
       {children}
     </DraftApplicationsContext.Provider>
   );

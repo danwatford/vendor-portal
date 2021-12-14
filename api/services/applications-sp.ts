@@ -13,7 +13,7 @@ import {
   CraftFairApplicationListItem,
   PersistedCraftFairApplicationListItem,
 } from "../interfaces/SpListItems";
-import { applyToItemsByFilter, createItem, updateItem } from "./sp";
+import { applyToItemsByFilter, createItem, deleteItem, updateItem } from "./sp";
 
 const vendorSiteUrl: string = process.env.VENDORS_SITE!;
 const vendorCraftApplicationsListGuid: string =
@@ -78,6 +78,16 @@ export const createCraftApplicationListItem = async (
     craftApplicationToListItem(application)
   );
   return listItemToCraftApplication(addResult.data);
+};
+
+export const deleteCraftApplicationListItem = async (
+  application: PersistedCraftFairApplication
+): Promise<void> => {
+  return deleteItem(
+    vendorSiteUrl,
+    vendorCraftApplicationsListGuid,
+    application.dbId
+  );
 };
 
 const craftApplicationToListItem = (

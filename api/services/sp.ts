@@ -37,6 +37,16 @@ export const updateItem = async <T extends ListItem>(
   return list.usingCaching().items.getById(itemId).update(item);
 };
 
+export const deleteItem = async (
+  site: string,
+  listGuid: string,
+  itemId: number
+): Promise<void> => {
+  const web = Web(site);
+  const list = web.lists.getById(listGuid);
+  return list.usingCaching().items.getById(itemId).delete();
+};
+
 const getPagedItemsdByFilter = async <T>(
   site: string,
   listGuid: string,

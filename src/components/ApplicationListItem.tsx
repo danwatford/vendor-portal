@@ -15,6 +15,7 @@ export interface ApplicationListItemProps<
 > {
   application: Appl<T>;
   clickHandler: (application: Appl<T>) => void;
+  deleteHandler: (application: Appl<T>) => void;
 }
 
 const ApplicationListItem = <
@@ -22,6 +23,7 @@ const ApplicationListItem = <
 >({
   application,
   clickHandler,
+  deleteHandler,
 }: ApplicationListItemProps<T>): JSX.Element => {
   let timestampComponent;
   if (isDraftCraftFairApplication(application)) {
@@ -31,13 +33,18 @@ const ApplicationListItem = <
   }
 
   return (
-    <div
-      onClick={() => clickHandler(application)}
-      className="block p-2 even:bg-yellow-50 odd:bg-yellow-100 hover:bg-yellow-200 cursor-pointer first:rounded-t-lg last:rounded-b-lg"
-    >
-      <span className="block">{application.tradingName}</span>
-      <span className="block">{timestampComponent}</span>
-      <span className="block">Total: £{application.totalCost}</span>
+    <div className="flex flex-row p-2 even:bg-yellow-50 odd:bg-yellow-100 hover:bg-yellow-200 first:rounded-t-lg last:rounded-b-lg">
+      <div
+        onClick={() => clickHandler(application)}
+        className="flex-auto block cursor-pointer "
+      >
+        <span className="block">{application.tradingName}</span>
+        <span className="block">{timestampComponent}</span>
+        <span className="block">Total: £{application.totalCost}</span>
+      </div>
+      <div className="">
+        <button onClick={() => deleteHandler(application)}>Delete</button>
+      </div>
     </div>
   );
 };

@@ -4,7 +4,7 @@ import { prepareExistingDraft } from "../services/DraftApplicationsManager";
 import ApplicationListItem from "./ApplicationListItem";
 
 const DraftApplicationsList: React.FC = () => {
-  const { draftApplications } = useDraftApplications();
+  const { draftApplications, deleteApplication } = useDraftApplications();
   const navigate = useNavigate();
 
   if (!draftApplications) {
@@ -17,13 +17,35 @@ const DraftApplicationsList: React.FC = () => {
     navigate("/craftApplication");
   };
 
-  const applicationsComponents = draftApplications.map((application, index) => (
-    <ApplicationListItem
-      key={index}
-      application={application}
-      clickHandler={() => clickHandler(index)}
-    />
-  ));
+  const deleteClickHandler = (i: number) => {
+    const draft = draftApplications[i];
+    deleteApplication(draft);
+  };
+
+  const draftApplicationsCount = draftApplications.reduce(
+    (prevCount, application) => {
+      if (application) {
+        return prevCount + 1;
+      } else {
+        return prevCount;
+      }
+    },
+    0
+  );
+
+  let applicationsComponents;
+  if (!draftApplicationsCount) {
+    applicationsComponents = <div>No applications</div>;
+  } else {
+    applicationsComponents = draftApplications.map((application, index) => (
+      <ApplicationListItem
+        key={index}
+        application={application}
+        clickHandler={() => clickHandler(index)}
+        deleteHandler={() => deleteClickHandler(index)}
+      />
+    ));
+  }
 
   return <div className="ml-2">{applicationsComponents}</div>;
 };

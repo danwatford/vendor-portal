@@ -1,26 +1,43 @@
 import {
   CraftFairApplication,
-  CraftFairApplicationWithContact,
-  PersistableCraftFairApplication,
   PersistedCraftFairApplication,
 } from "../interfaces/applications";
 import { User } from "../interfaces/user";
 import { getTotalCraftFairApplicationCost } from "./applications-pricing";
 import {
   createCraftApplicationListItem,
+  deleteCraftApplicationListItem,
   getCraftApplicationByIdAndUserId,
   getCraftApplicationsByUserId,
   updateCraftApplicationListItem,
 } from "./applications-sp";
 
 const ApplicationServiceErrorRuntimeType = "APPLICATION_SERVICE_ERROR";
-export type ApplicationServiceErrorCode = "APPLICATION_NOT_FOUND";
+export type ApplicationServiceErrorCode =
+  | "APPLICATION_NOT_FOUND"
+  | "DUMMY1"
+  | "DUMMY2";
 
 export type ApplicationServiceError<T extends ApplicationServiceErrorCode> = {
   runtimeType: typeof ApplicationServiceErrorRuntimeType;
   code: T;
   message: string;
 };
+
+type OrError<T, U extends ApplicationServiceErrorCode> = readonly [
+  ApplicationServiceError<U> | null,
+  T | null
+];
+
+function success<T>(result: T): readonly [null, T] {
+  return [null, result];
+}
+
+function fail<T extends ApplicationServiceErrorCode>(
+  code: T
+): readonly [ApplicationServiceError<T>, null] {
+  return [createError(code), null];
+}
 
 function createError<T extends ApplicationServiceErrorCode>(
   code: T
@@ -48,12 +65,14 @@ export const submitCraftFairApplication = async (
 export const deleteApplication = async (
   dbId: number,
   user: User
-): Promise<void | ApplicationServiceError<"APPLICATION_NOT_FOUND">> => {
+): Promise<OrError<boolean, "APPLICATION_NOT_FOUND">> => {
   const application = await getCraftApplication(dbId, user.userId);
 
   if (application) {
+    await deleteCraftApplicationListItem(application);
+    return success(true);
   } else {
-    return createError("APPLICATION_NOT_FOUND");
+    return fail("APPLICATION_NOT_FOUND");
   }
 };
 

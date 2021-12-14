@@ -112,6 +112,31 @@ export const prepareExistingSubmissionForEditing = (
   saveToEditingApplicationStore(application);
 };
 
+export const deleteApplication = async (
+  application: SubmittedCraftFairApplication
+) => {
+  const deleteUrl = new URL("/api/deleteApplication", document.location.href);
+  deleteUrl.searchParams.append("dbId", "" + application.dbId);
+
+  try {
+    const res = await fetch(deleteUrl.href);
+    if (res.status === 204) {
+      const deleteIndex = applications.findIndex(
+        (a) => a.dbId === application.dbId
+      );
+
+      if (deleteIndex >= 0) {
+        applications.splice(deleteIndex, 1);
+      }
+    }
+  } catch (err: any) {
+    applicationsError = "Error deleting application from server";
+    console.error("Error deleting application", err);
+  }
+
+  notifyApplicationListChangeSubscribers();
+};
+
 const notifyApplicationListChangeSubscribers = () => {
   applicationListSubscribers.forEach((subscription) => subscription());
 };

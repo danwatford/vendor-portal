@@ -7,7 +7,7 @@ const httpTrigger: AzureFunction = async function (
   req: HttpRequest
 ): Promise<void> {
   // Only authenticated users should call this function.
-  const user = await getUserFromCookie(req.headers.cookie);
+  const user = getUserFromCookie(req.headers.cookie);
 
   if (!user) {
     context.res = {
@@ -29,16 +29,24 @@ const httpTrigger: AzureFunction = async function (
           body: "Query argument must be a number: dbId",
         };
       } else {
-        await deleteApplication(dbId, user);
-        // if (
-        //   isApplicationServiceError<"APPLICATION_NOT_FOUND">(deleteApplication)
-        // ) {
-        //   const serviceError = deleteApplication as ApplicationServiceError;
-        // } else {
-        //   context.res = {
-        //     status: 204,
-        //   };
-        // }
+        const [error] = await deleteApplication(dbId, user);
+        if (error) {
+          switch (error.code) {
+            case "APPLICATION_NOT_FOUND":
+              context.res = {
+                status: 404,
+                body: "Application not found",
+              };
+              break;
+            default:
+              const _exhaustiveCheck: never = error.code;
+              return _exhaustiveCheck;
+          }
+        } else {
+          context.res = {
+            status: 204,
+          };
+        }
       }
     }
   }

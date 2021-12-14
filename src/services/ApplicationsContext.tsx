@@ -6,6 +6,7 @@ import {
   isRefreshingApplications,
   refreshApplicationsList,
   subscribeApplicationListChange,
+  deleteApplication as managerDeleteApplication,
 } from "./ApplicationsManager";
 import { useUserProfile } from "./UserProfileContext";
 
@@ -14,6 +15,7 @@ export type IApplicationsContext = {
   applications: SubmittedCraftFairApplication[];
   error: string;
   refreshApplications: () => void;
+  deleteApplication: (application: SubmittedCraftFairApplication) => void;
 };
 
 const ApplicationsContext = React.createContext<IApplicationsContext>({
@@ -21,6 +23,11 @@ const ApplicationsContext = React.createContext<IApplicationsContext>({
   applications: [],
   error: "",
   refreshApplications: () => {
+    throw new Error(
+      "ApplicationsContext consumer is not wrapped in a corresponding provider."
+    );
+  },
+  deleteApplication: () => {
     throw new Error(
       "ApplicationsContext consumer is not wrapped in a corresponding provider."
     );
@@ -43,9 +50,16 @@ const ApplicationsContextProvider = ({
     refreshApplicationsList();
   }, []);
 
+  const deleteApplication = useCallback(
+    async (application: SubmittedCraftFairApplication) => {
+      managerDeleteApplication(application);
+    },
+    []
+  );
+
   const applicationsListChangeHandler = useCallback(() => {
     setLoaded(!isRefreshingApplications());
-    setApplications(getApplications());
+    setApplications([...getApplications()]);
     setError(getApplicationsError());
   }, []);
 
@@ -66,6 +80,7 @@ const ApplicationsContextProvider = ({
         applications,
         error,
         refreshApplications: fetchApplications,
+        deleteApplication,
       }}
     >
       {children}

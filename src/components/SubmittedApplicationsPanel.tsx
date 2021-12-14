@@ -5,7 +5,7 @@ import { prepareExistingSubmissionForEditing } from "../services/ApplicationsMan
 import ApplicationListItem from "./ApplicationListItem";
 
 const SubmittedApplicationsList: React.FC = () => {
-  const { loaded, applications, error } = useApplications();
+  const { loaded, applications, error, deleteApplication } = useApplications();
   const navigate = useNavigate();
 
   let applicationsComponents;
@@ -27,6 +27,7 @@ const SubmittedApplicationsList: React.FC = () => {
         key={index}
         application={application}
         clickHandler={() => clickHandler(application)}
+        deleteHandler={() => deleteApplication(application)}
       />
     ));
   }
