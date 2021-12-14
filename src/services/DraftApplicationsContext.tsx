@@ -3,7 +3,7 @@ import { LocalCraftFairApplication } from "../interfaces/Applications";
 import {
   getDrafts,
   subscribeDraftApplicationListChange,
-} from "./LocalApplicationsStore";
+} from "./DraftApplicationsManager";
 
 export type IDraftApplicationsContext = {
   draftApplications: LocalCraftFairApplication[];

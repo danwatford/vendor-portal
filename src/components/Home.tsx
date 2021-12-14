@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { prepareNewDraft } from "../services/LocalApplicationsStore";
+import { prepareNewDraftForEditing } from "../services/DraftApplicationsManager";
 import { useUserProfile } from "../services/UserProfileContext";
 import DraftApplicationsPanel from "./DraftApplicationsPanel";
 import HomeLayout from "./HomeLayout";
@@ -13,7 +13,7 @@ const Home: React.FC<WelcomeProps> = () => {
   const navigate = useNavigate();
 
   const newCraftApplicationHandler = useCallback(() => {
-    if (prepareNewDraft()) {
+    if (prepareNewDraftForEditing()) {
       navigate("/craftApplication");
     }
   }, [navigate]);

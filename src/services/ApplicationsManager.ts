@@ -3,12 +3,11 @@ import {
   SubmittedCraftFairApplication,
 } from "../interfaces/Applications";
 import {
-  clearCurrentEditingApplication,
-  clearDraft,
-  getCurrentEditingApplication,
-  saveCurrentEditingApplication,
-  saveCurrentEditingApplicationAsDraft,
-} from "./LocalApplicationsStore";
+  clearEditingApplicationStore,
+  loadFromEditingApplicationStore,
+  saveToEditingApplicationStore,
+} from "./EditingApplicationStore";
+import { removeDraft } from "./DraftApplicationsManager";
 
 const applicationListSubscribers: Array<() => void> = [];
 let refreshingApplications = false;
@@ -16,10 +15,6 @@ let applications: Array<SubmittedCraftFairApplication> = [];
 
 export const subscribeApplicationListChange = (subscriber: () => void) => {
   applicationListSubscribers.push(subscriber);
-};
-
-export const saveCurrentDraftApplication = () => {
-  saveCurrentEditingApplicationAsDraft();
 };
 
 export const getApplications = () => applications;
@@ -42,8 +37,8 @@ export const refreshApplicationsList = async () => {
 
 export const isRefreshingApplications = () => refreshingApplications;
 
-export const submitCurrentCraftApplication = async (): Promise<void> => {
-  const currentCraftApplication = getCurrentEditingApplication();
+export const submitEditingApplication = async (): Promise<void> => {
+  const currentCraftApplication = loadFromEditingApplicationStore();
   if (!currentCraftApplication) {
     throw new Error("No current craft application available for submission.");
   }
@@ -63,10 +58,10 @@ export const submitCurrentCraftApplication = async (): Promise<void> => {
     if (isLocalCraftFairApplication(currentCraftApplication)) {
       // Application was a draft. Now it has been successfully submitted it should be removed from
       // the drafts storage.
-      clearDraft(currentCraftApplication.draftId);
+      removeDraft(currentCraftApplication.draftId);
     }
 
-    clearCurrentEditingApplication();
+    clearEditingApplicationStore();
     refreshApplicationsList();
   } else {
     throw new Error(
@@ -79,7 +74,7 @@ export const submitCurrentCraftApplication = async (): Promise<void> => {
 export const prepareExistingSubmissionForEditing = (
   application: SubmittedCraftFairApplication
 ) => {
-  saveCurrentEditingApplication(application);
+  saveToEditingApplicationStore(application);
 };
 
 const notifyApplicationListChangeSubscribers = () => {

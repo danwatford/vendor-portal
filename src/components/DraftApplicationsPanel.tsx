@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useDraftApplications } from "../services/DraftApplicationsContext";
-import { prepareExistingDraft } from "../services/LocalApplicationsStore";
+import { prepareExistingDraft } from "../services/DraftApplicationsManager";
 import ApplicationListItem from "./ApplicationListItem";
 
 const DraftApplicationsList: React.FC = () => {

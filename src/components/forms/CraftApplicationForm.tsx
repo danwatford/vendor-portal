@@ -14,11 +14,11 @@ import {
   pitchBaseCost,
   pitchEletricalOptionCost,
 } from "../../services/applications-pricing";
-import { saveCurrentDraftApplication } from "../../services/ApplicationsManager";
+import { saveEditingApplicationAsDraft } from "../../services/DraftApplicationsManager";
 import {
-  getCurrentEditingApplication,
-  saveCurrentEditingApplication,
-} from "../../services/LocalApplicationsStore";
+  loadFromEditingApplicationStore,
+  saveToEditingApplicationStore,
+} from "../../services/EditingApplicationStore";
 import { useUserProfile } from "../../services/UserProfileContext";
 import PageLayout from "../PageLayout";
 import { AddressField, PitchSelection, TextArea, TextInput } from "./Fields";
@@ -37,7 +37,7 @@ const CraftApplicationForm: React.FC = () => {
   const [initialValues] = useState<
     LocalCraftFairApplication | SubmittedCraftFairApplication | undefined
   >(() => {
-    const currentApplication = getCurrentEditingApplication();
+    const currentApplication = loadFromEditingApplicationStore();
     if (!currentApplication) {
       setIsError(true);
       setErrorDescription(
@@ -53,7 +53,7 @@ const CraftApplicationForm: React.FC = () => {
   const navigate = useNavigate();
 
   const saveDraftClickedHandler = useCallback(() => {
-    saveCurrentDraftApplication();
+    saveEditingApplicationAsDraft();
     navigate("/");
   }, [navigate]);
 
@@ -113,8 +113,8 @@ const CraftApplicationForm: React.FC = () => {
           return (
             <form onSubmit={formik.handleSubmit} className={"text-left"}>
               <LocalPersist
-                loadValuesFromStorage={getCurrentEditingApplication}
-                saveValuesToStorage={saveCurrentEditingApplication}
+                loadValuesFromStorage={loadFromEditingApplicationStore}
+                saveValuesToStorage={saveToEditingApplicationStore}
               />
 
               <ScrollToFieldError />

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { submitCurrentCraftApplication } from "../services/ApplicationsManager";
+import { submitEditingApplication } from "../services/ApplicationsManager";
 import PageLayout from "./PageLayout";
 import Spinner from "./Spinner";
 
@@ -10,7 +10,7 @@ const SubmittingCraftApplication: React.FC<WelcomeProps> = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    submitCurrentCraftApplication()
+    submitEditingApplication()
       .then(() => {
         navigate("/");
       })
