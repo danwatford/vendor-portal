@@ -1,6 +1,7 @@
 import {
   isDraftCraftFairApplication,
   SubmittedCraftFairApplication,
+  SubmittedCraftFairApplicationRunType,
 } from "../interfaces/Applications";
 import {
   clearEditingApplicationStore,
@@ -55,14 +56,31 @@ export const submitEditingApplication = async (): Promise<void> => {
 
   const submitResponse = await fetch("/api/submitCraftApplication", options);
   if (submitResponse.status === 200) {
+    clearEditingApplicationStore();
+
+    const json = await submitResponse.json();
+    const submittedApplication =
+      SubmittedCraftFairApplicationRunType.check(json);
+
     if (isDraftCraftFairApplication(currentCraftApplication)) {
       // Application was a draft. Now it has been successfully submitted it should be removed from
       // the drafts storage.
       removeDraft(currentCraftApplication.draftId);
-    }
 
-    clearEditingApplicationStore();
-    refreshApplicationsList();
+      // Add the new application to the submitted applications list.
+      applications.push(submittedApplication);
+      notifyApplicationListChangeSubscribers();
+    } else {
+      const updateIndex = applications.findIndex(
+        (a) => a.dbId === submittedApplication.dbId
+      );
+      if (updateIndex >= 0) {
+        applications[updateIndex] = submittedApplication;
+        notifyApplicationListChangeSubscribers();
+      } else {
+        refreshApplicationsList();
+      }
+    }
   } else {
     throw new Error(
       `Status code: ${submitResponse.status} when submitting application.`
