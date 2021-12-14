@@ -19,7 +19,7 @@ export const encodeAuthState = (authState: AuthState): string => {
   return hash + authStateJsonHex;
 };
 
-export const decodeAuthState = (encodedAuthState: string): AuthState => {
+export const decodeAuthState = (encodedAuthState: string): AuthState | null => {
   if (!encodedAuthState || encodedAuthState.length < 65) {
     return null;
   }
@@ -42,5 +42,5 @@ export const decodeAuthState = (encodedAuthState: string): AuthState => {
 };
 
 const getHmac = (): Hmac => {
-  return createHmac("sha256", process.env.COOKIE_SECRET);
+  return createHmac("sha256", process.env.COOKIE_SECRET!);
 };

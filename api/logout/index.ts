@@ -5,7 +5,7 @@ const httpTrigger: AzureFunction = async function (
   context: Context,
   req: HttpRequest
 ): Promise<void> {
-  context.res = logoutHandler(context);
+  context.res = logoutHandler(req);
 };
 
 export default httpTrigger;

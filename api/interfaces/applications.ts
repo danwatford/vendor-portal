@@ -41,7 +41,7 @@ export const VendorContactRunType = Record({
 });
 
 export const CraftFairApplicationRunType = Record({
-  status: Optional(ApplicationStatusRunType),
+  dbId: Optional(Number),
   tradingName: String,
   addressLine1: String,
   addressLine2: Optional(String),
@@ -60,18 +60,38 @@ export const CraftFairApplicationRunType = Record({
   campingRequired: Boolean,
   tables: Number,
   totalCost: Optional(Number),
-  userId: Optional(String),
-  contactFirstNames: Optional(String),
-  contactLastName: Optional(String),
-  email: Optional(String),
-  dbId: Optional(Number),
-  created: Optional(String),
 });
+
+export const PersistableCraftFairApplicationRunType =
+  CraftFairApplicationRunType.And(
+    Record({
+      email: String,
+      userId: String,
+      contactFirstNames: String,
+      contactLastName: String,
+      status: ApplicationStatusRunType,
+      totalCost: Number,
+    })
+  );
+
+export const PersistedCraftFairApplicationRunType =
+  PersistableCraftFairApplicationRunType.And(
+    Record({
+      dbId: Number,
+      created: String,
+    })
+  );
 
 export type PitchType = Static<typeof PitchTypeRunType>;
 export type ElectricalOption = Static<typeof ElectricalOptionRunType>;
 export type VendorContact = Static<typeof VendorContactRunType>;
 export type CraftFairApplication = Static<typeof CraftFairApplicationRunType>;
+export type PersistableCraftFairApplication = Static<
+  typeof PersistableCraftFairApplicationRunType
+>;
+export type PersistedCraftFairApplication = Static<
+  typeof PersistedCraftFairApplicationRunType
+>;
 export type ApplicationStatus = Static<typeof ApplicationStatusRunType>;
 
 export type CraftFairApplicationWithContact = VendorContact &

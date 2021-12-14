@@ -2,18 +2,22 @@ import {
   ApplicationStatus,
   ApplicationStatusRunType,
   CraftFairApplication,
-  CraftFairApplicationWithContact,
   ElectricalOption,
   ElectricalOptionRunType,
+  PersistableCraftFairApplication,
+  PersistedCraftFairApplication,
   PitchType,
   PitchTypeRunType,
 } from "../interfaces/applications";
-import { CraftFairApplicationListItem } from "../interfaces/SpListItems";
+import {
+  CraftFairApplicationListItem,
+  PersistedCraftFairApplicationListItem,
+} from "../interfaces/SpListItems";
 import { applyToItemsByFilter, createItem, updateItem } from "./sp";
 
-const vendorSiteUrl: string = process.env.VENDORS_SITE;
+const vendorSiteUrl: string = process.env.VENDORS_SITE!;
 const vendorCraftApplicationsListGuid: string =
-  process.env.VENDORS_CRAFT_APPLICATIONS_LIST_GUID;
+  process.env.VENDORS_CRAFT_APPLICATIONS_LIST_GUID!;
 
 export const getCraftApplicationByIdAndUserId = async (
   id: number,
@@ -37,14 +41,14 @@ export const getCraftApplicationsByUserId = async (
 
 const getCraftApplicationsByFilter = async (
   filter?: string
-): Promise<CraftFairApplication[]> => {
+): Promise<PersistedCraftFairApplication[]> => {
   return applyToItemsByFilter<
-    CraftFairApplicationListItem,
-    CraftFairApplication[]
+    PersistedCraftFairApplicationListItem,
+    PersistedCraftFairApplication[]
   >(
     vendorSiteUrl,
     vendorCraftApplicationsListGuid,
-    (items: CraftFairApplicationListItem[]) => {
+    (items: PersistedCraftFairApplicationListItem[]) => {
       return Promise.resolve(
         items.map((item) => listItemToCraftApplication(item))
       );
@@ -53,16 +57,21 @@ const getCraftApplicationsByFilter = async (
   );
 };
 export const updateCraftApplicationListItem = async (
-  application: CraftFairApplicationWithContact
+  application: PersistedCraftFairApplication
 ): Promise<CraftFairApplication> => {
   const listItem = craftApplicationToListItem(application);
-  await updateItem(vendorSiteUrl, vendorCraftApplicationsListGuid, listItem);
+  await updateItem(
+    vendorSiteUrl,
+    vendorCraftApplicationsListGuid,
+    application.dbId,
+    listItem
+  );
   return application;
 };
 
 export const createCraftApplicationListItem = async (
-  application: CraftFairApplicationWithContact
-): Promise<CraftFairApplicationWithContact> => {
+  application: PersistableCraftFairApplication
+): Promise<PersistedCraftFairApplication> => {
   const addResult = await createItem<CraftFairApplicationListItem>(
     vendorSiteUrl,
     vendorCraftApplicationsListGuid,
@@ -72,10 +81,9 @@ export const createCraftApplicationListItem = async (
 };
 
 const craftApplicationToListItem = (
-  craftApplication: CraftFairApplication
+  craftApplication: PersistableCraftFairApplication
 ): CraftFairApplicationListItem => {
   return {
-    ID: craftApplication.dbId,
     Title: craftApplication.tradingName,
     Status: craftApplication.status,
     DescriptionOfStall: craftApplication.descriptionOfStall,
@@ -103,8 +111,8 @@ const craftApplicationToListItem = (
 };
 
 const listItemToCraftApplication = (
-  item: CraftFairApplicationListItem
-): CraftFairApplicationWithContact => {
+  item: PersistedCraftFairApplicationListItem
+): PersistedCraftFairApplication => {
   const status: ApplicationStatus = ApplicationStatusRunType.guard(item.Status)
     ? item.Status
     : "Pending Deposit";

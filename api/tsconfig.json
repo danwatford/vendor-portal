@@ -6,6 +6,8 @@
     "rootDir": ".",
     "sourceMap": true,
     "strict": false,
+    "strictNullChecks": true,
+    "skipLibCheck": true,
     "allowSyntheticDefaultImports": true
   }
 }

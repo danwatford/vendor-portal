@@ -9,13 +9,16 @@ const MAX_COOKIE_AGE_SECONDS = 60 * 60 * 12;
 // If we have a user id included in a cookie, use it to look up the user's profile.
 // If the minimum profile fields that are populated by the identity provider are present
 // then we can consider the user identified.
-export const getUserFromCookie = (cookie: string): User => {
+export const getUserFromCookie = (cookie: string | undefined): User | null => {
   if (cookie) {
     const cookies = parse(cookie);
     const vendorPortalUserCookie = cookies.vendorPortalUser;
-    const [_, user] = userFromCookie(vendorPortalUserCookie);
-    if (isUserValid(user)) {
-      return user;
+    const fromCookieResult = userFromCookie(vendorPortalUserCookie);
+    if (fromCookieResult) {
+      const [_, user] = fromCookieResult;
+      if (isUserValid(user)) {
+        return user;
+      }
     }
   }
   return null;
@@ -39,7 +42,7 @@ export const createUserCookie = (userId: string, user: User): Cookie => {
     })
   ).toString("hex");
 
-  const hmac = createHmac("sha256", process.env.COOKIE_SECRET);
+  const hmac = createHmac("sha256", process.env.COOKIE_SECRET!);
   hmac.update(hexEncodedCookieValue);
   const hash = hmac.digest("hex");
 
@@ -53,9 +56,11 @@ export const createUserCookie = (userId: string, user: User): Cookie => {
   };
 };
 
-const userFromCookie = (cookieValue: string): [userId: string, user: User] => {
+const userFromCookie = (
+  cookieValue: string
+): [userId: string, user: User] | null => {
   if (!cookieValue || cookieValue.length < 65) {
-    return [null, null];
+    return null;
   }
 
   console.log("userFromCookie: " + cookieValue);
@@ -63,10 +68,10 @@ const userFromCookie = (cookieValue: string): [userId: string, user: User] => {
   const hash = cookieValue.substring(0, 64);
   const hexEncodedValue = cookieValue.substring(64);
   if (!hash || !hexEncodedValue) {
-    return [null, null];
+    return null;
   }
 
-  const hmac = createHmac("sha256", process.env.COOKIE_SECRET);
+  const hmac = createHmac("sha256", process.env.COOKIE_SECRET!);
   hmac.update(hexEncodedValue);
   const calculatedHash = hmac.digest("hex");
 

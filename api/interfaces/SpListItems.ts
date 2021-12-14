@@ -1,30 +1,35 @@
-export interface ListItem {
-  ID?: number;
+export type ListItem = {
   Title: string;
-  Created?: string;
-}
+};
 
-export interface UserListItem extends ListItem {
+export type PersistedListItem = ListItem & {
+  ID: number;
+  Created: string;
+};
+
+export type UserListItem = ListItem & {
   UserId: string;
   IdentityProvider: string;
   ContactFirstName: string;
   ContactLastName: string;
   ContactEmail: string;
-}
+};
 
-export interface CraftFairApplicationListItem extends ListItem {
+export type PersistedUserListItem = UserListItem & PersistedListItem;
+
+export type CraftFairApplicationListItem = ListItem & {
   Title: string;
   Status: string;
   DescriptionOfStall: string;
   AddressLine1: string;
-  AddressLine2: string;
+  AddressLine2?: string;
   City: string;
   State: string;
   Postcode: string;
   Country: string;
-  Landline: string;
-  Mobile: string;
-  Website: string;
+  Landline?: string;
+  Mobile?: string;
+  Website?: string;
   ContactFirstName: string;
   ContactLastName: string;
   ContactEmail: string;
@@ -36,4 +41,7 @@ export interface CraftFairApplicationListItem extends ListItem {
   Tables: number;
   TotalCost: number;
   UserId: string;
-}
+};
+
+export type PersistedCraftFairApplicationListItem =
+  CraftFairApplicationListItem & PersistedListItem;

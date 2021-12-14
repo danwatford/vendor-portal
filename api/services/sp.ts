@@ -4,9 +4,9 @@ import { IItemAddResult, IItemUpdateResult } from "@pnp/sp-commonjs/items";
 import { SPFetchClient } from "@pnp/nodejs-commonjs";
 import { ListItem } from "../interfaces/SpListItems";
 
-const siteUrl: string = process.env.VENDORS_SITE;
-const clientId: string = process.env.VENDORS_CLIENT_ID;
-const clientSecret: string = process.env.VENDORS_CLIENT_SECRET;
+const siteUrl: string = process.env.VENDORS_SITE!;
+const clientId: string = process.env.VENDORS_CLIENT_ID!;
+const clientSecret: string = process.env.VENDORS_CLIENT_SECRET!;
 
 sp.setup({
   sp: {
@@ -29,11 +29,12 @@ export const createItem = async <T>(
 export const updateItem = async <T extends ListItem>(
   site: string,
   listGuid: string,
+  itemId: number,
   item: T
 ): Promise<IItemUpdateResult> => {
   const web = Web(site);
   const list = web.lists.getById(listGuid);
-  return list.usingCaching().items.getById(item.ID).update(item);
+  return list.usingCaching().items.getById(itemId).update(item);
 };
 
 const getPagedItemsdByFilter = async <T>(
@@ -57,7 +58,7 @@ export const applyToPagedItemsdByFilter = async <T, U>(
   filter?: string,
   doPaging: boolean = true
 ): Promise<U> => {
-  let retVal: U = null;
+  let retVal: U;
   let pagedItems = await getPagedItemsdByFilter<T>(site, listGuid, filter);
   retVal = await callback(pagedItems.results);
 

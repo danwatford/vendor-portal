@@ -98,49 +98,57 @@ export const redirectHandler = async (
 ): Promise<HttpResponseContextObject> => {
   const cca = getConfidentialClientApplication(context);
 
-  context.log("In redirect. Checking query state: " + req.query.state);
+  if (req.query.state) {
+    const authState = decodeAuthState(req.query.state);
 
-  const authState = decodeAuthState(req.query.state);
+    // determine where the request comes from
+    if (authState && authState.type === "login" && req.query.authcode) {
+      context.log("In LOGIN state");
+      // prepare the request for authentication
+      const tokenRequest: msal.AuthorizationCodeRequest = {
+        scopes: ["openid", "offline_access"],
+        code: req.query.authcode,
+        redirectUri: getAuthCodeRedirectUrl(req),
+      };
 
-  // determine where the request comes from
-  if (authState.type === "login") {
-    context.log("In LOGIN state");
-    // prepare the request for authentication
-    const tokenRequest: msal.AuthorizationCodeRequest = {
-      scopes: ["openid", "offline_access"],
-      code: req.query.authcode,
-      redirectUri: getAuthCodeRedirectUrl(req),
-    };
+      context.log("About to request ID token by code");
+      const tokenResponse = await cca.acquireTokenByCode(tokenRequest);
+      context.log("Got token response: " + JSON.stringify(tokenResponse));
+      if (tokenResponse) {
+        const idClaims = tokenResponse.idTokenClaims;
+        const user: User = {
+          userId: idClaims["sub"],
+          identityProvider: idClaims["idp"] || "email",
+          email: idClaims["emails"][0],
+          displayName: idClaims["name"],
+          firstName: idClaims["given_name"],
+          lastName: idClaims["family_name"],
+        };
 
-    context.log("About to request ID token by code");
-    const tokenResponse = await cca.acquireTokenByCode(tokenRequest);
-    context.log("Got token response: " + JSON.stringify(tokenResponse));
-    const idClaims = tokenResponse.idTokenClaims;
-    const user: User = {
-      userId: idClaims["sub"],
-      identityProvider: idClaims["idp"] || "email",
-      email: idClaims["emails"][0],
-      displayName: idClaims["name"],
-      firstName: idClaims["given_name"],
-      lastName: idClaims["family_name"],
-      dbId: null,
-    };
+        const persistedUser = await createOrUpdateUser(user);
+        const userCookie = createUserCookie(
+          persistedUser.userId,
+          persistedUser
+        );
+        const cookies: Cookie[] = [userCookie];
 
-    const persistedUser = await createOrUpdateUser(user);
-    const userCookie = createUserCookie(persistedUser.userId, persistedUser);
-    const cookies: Cookie[] = [userCookie];
-
-    return {
-      status: 302,
-      cookies,
-      headers: {
-        Location: authState.postAuthRedirectUrl,
-      },
-    };
+        return {
+          status: 302,
+          cookies,
+          headers: {
+            Location: authState.postAuthRedirectUrl,
+          },
+        };
+      }
+    }
   }
+
+  return {
+    status: 400,
+  };
 };
 
-export const logoutHandler = (context: Context): HttpResponseContextObject => {
+export const logoutHandler = (req: HttpRequest): HttpResponseContextObject => {
   const expiredUserCookie = createInvalidUserCookie();
   const cookies: Cookie[] = [expiredUserCookie];
 
@@ -149,7 +157,7 @@ export const logoutHandler = (context: Context): HttpResponseContextObject => {
     cookies,
     headers: {
       Location: getLogoutUrl(
-        context,
+        req,
         b2cPolicies.authorities.signUpSignIn.authority
       ),
     },
@@ -187,9 +195,9 @@ const getPostLogoutUrl = (req: HttpRequest): string => {
 const getConfidentialClientConfig = (context: Context) => {
   return {
     auth: {
-      clientId: process.env.B2C_CLIENT_ID,
+      clientId: process.env.B2C_CLIENT_ID!,
       authority: b2cPolicies.authorities.signUpSignIn.authority,
-      clientSecret: process.env.B2C_CLIENT_SECRET,
+      clientSecret: process.env.B2C_CLIENT_SECRET!,
       knownAuthorities: [b2cPolicies.authorityDomain],
     },
     system: {
@@ -229,9 +237,9 @@ const getAuthCodeUrl = async (
   return cca.getAuthCodeUrl(authCodeRequest);
 };
 
-const getLogoutUrl = (context: Context, authority: string) => {
+const getLogoutUrl = (req: HttpRequest, authority: string) => {
   const logoutUrl = new URL(authority + "/oauth2/v2.0/logout");
-  logoutUrl.searchParams.append("redirect_uri", getPostLogoutUrl(context.req));
+  logoutUrl.searchParams.append("redirect_uri", getPostLogoutUrl(req));
 
   return logoutUrl.href;
 };

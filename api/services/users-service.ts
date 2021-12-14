@@ -1,4 +1,4 @@
-import { User } from "../interfaces/user";
+import { PersistedUser, User } from "../interfaces/user";
 import {
   getUser as spGetUser,
   createUserListItem,
@@ -11,7 +11,7 @@ export const createOrUpdateUser = async (user: User): Promise<User> => {
 
   const existingUser = await getUserWithoutValidation(userId);
   if (existingUser) {
-    const mergedUser: User = {
+    const mergedUser: PersistedUser = {
       ...existingUser,
       ...user,
       dbId: existingUser.dbId,
@@ -22,11 +22,13 @@ export const createOrUpdateUser = async (user: User): Promise<User> => {
   }
 };
 
-export const getUser = async (userId: string): Promise<User> => {
+export const getUser = async (userId: string): Promise<User | null> => {
   const user = await getUserWithoutValidation(userId);
-  return isUserValid(user) ? user : undefined;
+  return isUserValid(user) ? user : null;
 };
 
-const getUserWithoutValidation = async (userId: string): Promise<User> => {
+const getUserWithoutValidation = async (
+  userId: string
+): Promise<PersistedUser | null> => {
   return spGetUser(userId);
 };

@@ -1,14 +1,36 @@
 import {
   CraftFairApplication,
   CraftFairApplicationWithContact,
+  PersistableCraftFairApplication,
+  PersistedCraftFairApplication,
 } from "../interfaces/applications";
 import { User } from "../interfaces/user";
+import { getTotalCraftFairApplicationCost } from "./applications-pricing";
 import {
   createCraftApplicationListItem,
   getCraftApplicationByIdAndUserId,
   getCraftApplicationsByUserId,
   updateCraftApplicationListItem,
 } from "./applications-sp";
+
+const ApplicationServiceErrorRuntimeType = "APPLICATION_SERVICE_ERROR";
+export type ApplicationServiceErrorCode = "APPLICATION_NOT_FOUND";
+
+export type ApplicationServiceError<T extends ApplicationServiceErrorCode> = {
+  runtimeType: typeof ApplicationServiceErrorRuntimeType;
+  code: T;
+  message: string;
+};
+
+function createError<T extends ApplicationServiceErrorCode>(
+  code: T
+): ApplicationServiceError<T> {
+  return {
+    runtimeType: ApplicationServiceErrorRuntimeType,
+    code,
+    message: "",
+  };
+}
 
 export const getCraftApplicationsForUser = async (
   userId: string
@@ -23,10 +45,22 @@ export const submitCraftFairApplication = async (
   return createOrUpdateCraftApplication(application, user);
 };
 
+export const deleteApplication = async (
+  dbId: number,
+  user: User
+): Promise<void | ApplicationServiceError<"APPLICATION_NOT_FOUND">> => {
+  const application = await getCraftApplication(dbId, user.userId);
+
+  if (application) {
+  } else {
+    return createError("APPLICATION_NOT_FOUND");
+  }
+};
+
 const getCraftApplication = async (
   dbId: number,
   userId: string
-): Promise<CraftFairApplication> => {
+): Promise<PersistedCraftFairApplication | null> => {
   return getCraftApplicationByIdAndUserId(dbId, userId);
 };
 
@@ -41,13 +75,15 @@ const createOrUpdateCraftApplication = async (
     );
 
     if (existingApplication) {
-      const mergedApplication: CraftFairApplicationWithContact = {
+      const mergedApplication: PersistedCraftFairApplication = {
         ...existingApplication,
         ...craftApplication,
         userId: user.userId,
         contactFirstNames: user.firstName,
         contactLastName: user.lastName,
         email: user.email,
+        status: "Pending Deposit",
+        totalCost: getTotalCraftFairApplicationCost(craftApplication),
       };
 
       return updateCraftApplicationListItem(mergedApplication);
@@ -63,5 +99,7 @@ const createOrUpdateCraftApplication = async (
     contactFirstNames: user.firstName,
     contactLastName: user.lastName,
     email: user.email,
+    status: "Pending Deposit",
+    totalCost: getTotalCraftFairApplicationCost(craftApplication),
   });
 };
