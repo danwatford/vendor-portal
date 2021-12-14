@@ -23,6 +23,7 @@ import { useUserProfile } from "../../services/UserProfileContext";
 import PageLayout from "../PageLayout";
 import { AddressField, PitchSelection, TextArea, TextInput } from "./Fields";
 import LocalPersist from "./LocalPersist";
+import ScrollToFieldError from "./ScrollToFieldError";
 import { CraftFairApplicationValidationSchema } from "./ValidationSchemas";
 
 export interface CraftApplicationFormProps {
@@ -76,6 +77,8 @@ const CraftApplicationForm: React.FC = () => {
                 loadValuesFromStorage={getCurrentEditingApplication}
                 saveValuesToStorage={saveCurrentEditingApplication}
               />
+
+              <ScrollToFieldError />
 
               <h2 className="mt-4 text-2xl font-black">Trader Information</h2>
               <TextInput name="tradingName" label="Trading name" type="text" />
@@ -320,7 +323,7 @@ const CraftApplicationForm: React.FC = () => {
                 onClick={saveDraftClickedHandler}
                 className="m-4 underline"
               >
-                Save for later
+                Save as draft
               </button>
             </form>
           );
