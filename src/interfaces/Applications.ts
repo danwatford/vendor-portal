@@ -7,6 +7,7 @@ import {
   Union,
   Static,
   Optional,
+  Array,
 } from "runtypes";
 
 export const ApplicationStatusRunType = Union(
@@ -43,13 +44,13 @@ export const VendorContactRunType = Record({
 export const CraftFairApplicationRunType = Record({
   tradingName: String,
   addressLine1: String,
-  addressLine2: String,
+  addressLine2: Optional(String),
   city: String,
   state: String,
   postcode: String,
   country: String,
-  landline: String,
-  mobile: String,
+  landline: Optional(String),
+  mobile: Optional(String),
   descriptionOfStall: String,
   pitchType: PitchTypeRunType,
   pitchAdditionalWidth: Number,
@@ -79,6 +80,10 @@ export const SubmittedCraftFairApplicationRunType =
       created: String,
     })
   );
+
+export const SubmittedCraftFairApplicationListRunType = Array(
+  SubmittedCraftFairApplicationRunType
+);
 
 export type PitchType = Static<typeof PitchTypeRunType>;
 export type ElectricalOption = Static<typeof ElectricalOptionRunType>;

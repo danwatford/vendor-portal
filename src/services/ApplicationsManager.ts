@@ -1,6 +1,7 @@
 import {
   isDraftCraftFairApplication,
   SubmittedCraftFairApplication,
+  SubmittedCraftFairApplicationListRunType,
   SubmittedCraftFairApplicationRunType,
 } from "../interfaces/Applications";
 import {
@@ -9,10 +10,12 @@ import {
   saveToEditingApplicationStore,
 } from "./EditingApplicationStore";
 import { removeDraft } from "./DraftApplicationsManager";
+import { ValidationError } from "runtypes";
 
 const applicationListSubscribers: Array<() => void> = [];
 let refreshingApplications = false;
 let applications: Array<SubmittedCraftFairApplication> = [];
+let applicationsError: string = "";
 
 export const subscribeApplicationListChange = (subscriber: () => void) => {
   applicationListSubscribers.push(subscriber);
@@ -20,17 +23,31 @@ export const subscribeApplicationListChange = (subscriber: () => void) => {
 
 export const getApplications = () => applications;
 
+export const getApplicationsError = () => applicationsError;
+
 export const refreshApplicationsList = async () => {
   refreshingApplications = true;
+  applicationsError = "";
   notifyApplicationListChangeSubscribers();
   try {
     const res = await fetch("/api/getApplications");
-    const json: SubmittedCraftFairApplication[] = await res.json();
+    const json: SubmittedCraftFairApplication[] =
+      SubmittedCraftFairApplicationListRunType.check(await res.json());
     if (json) {
       applications = json;
     }
-  } catch (e) {
-    console.error(`Failed to unpack applications from JSON.`, e);
+  } catch (err: any) {
+    applicationsError = "Error processing list of applications from server: ";
+    applications = [];
+    if (err?.name === "ValidationError") {
+      const validationError = err as ValidationError;
+      if (validationError?.code === "CONTENT_INCORRECT") {
+        console.error(
+          "Error processing list of applications from server: ",
+          validationError.details
+        );
+      }
+    }
   }
   refreshingApplications = false;
   notifyApplicationListChangeSubscribers();

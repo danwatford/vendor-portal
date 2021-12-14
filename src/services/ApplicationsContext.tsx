@@ -2,6 +2,7 @@ import React, { useCallback, useContext, useEffect, useState } from "react";
 import { SubmittedCraftFairApplication } from "../interfaces/Applications";
 import {
   getApplications,
+  getApplicationsError,
   isRefreshingApplications,
   refreshApplicationsList,
   subscribeApplicationListChange,
@@ -11,12 +12,14 @@ import { useUserProfile } from "./UserProfileContext";
 export type IApplicationsContext = {
   loaded: boolean;
   applications: SubmittedCraftFairApplication[];
+  error: string;
   refreshApplications: () => void;
 };
 
 const ApplicationsContext = React.createContext<IApplicationsContext>({
   loaded: false,
   applications: [],
+  error: "",
   refreshApplications: () => {
     throw new Error(
       "ApplicationsContext consumer is not wrapped in a corresponding provider."
@@ -33,6 +36,7 @@ const ApplicationsContextProvider = ({
   const [applications, setApplications] = useState<
     SubmittedCraftFairApplication[]
   >(() => getApplications());
+  const [error, setError] = useState<string>(() => getApplicationsError());
   const [loaded, setLoaded] = useState(() => !isRefreshingApplications());
 
   const fetchApplications = useCallback(async () => {
@@ -42,6 +46,7 @@ const ApplicationsContextProvider = ({
   const applicationsListChangeHandler = useCallback(() => {
     setLoaded(!isRefreshingApplications());
     setApplications(getApplications());
+    setError(getApplicationsError());
   }, []);
 
   useEffect(() => {
@@ -56,7 +61,12 @@ const ApplicationsContextProvider = ({
 
   return (
     <ApplicationsContext.Provider
-      value={{ loaded, applications, refreshApplications: fetchApplications }}
+      value={{
+        loaded,
+        applications,
+        error,
+        refreshApplications: fetchApplications,
+      }}
     >
       {children}
     </ApplicationsContext.Provider>
