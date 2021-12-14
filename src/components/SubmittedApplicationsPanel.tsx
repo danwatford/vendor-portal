@@ -1,8 +1,12 @@
+import { useNavigate } from "react-router-dom";
+import { SubmittedCraftFairApplication } from "../interfaces/Applications";
 import { useApplications } from "../services/ApplicationsContext";
+import { prepareExistingSubmissionForEditing } from "../services/ApplicationsManager";
 import ApplicationListItem from "./ApplicationListItem";
 
 const SubmittedApplicationsList: React.FC = () => {
   const { loaded, applications, refreshApplications } = useApplications();
+  const navigate = useNavigate();
 
   if (!loaded) {
     return <div>Loading applications...</div>;
@@ -12,15 +16,16 @@ const SubmittedApplicationsList: React.FC = () => {
     return <div>No applications</div>;
   }
 
-  const clickHandler = (i: number) => {
-    // do nothing
+  const clickHandler = (application: SubmittedCraftFairApplication) => {
+    prepareExistingSubmissionForEditing(application);
+    navigate("/craftApplication");
   };
 
   const applicationsComponents = applications.map((application, index) => (
     <ApplicationListItem
       key={index}
       application={application}
-      clickHandler={() => clickHandler(index)}
+      clickHandler={() => clickHandler(application)}
     />
   ));
 

@@ -1,9 +1,9 @@
 import { Field, Formik } from "formik";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import {
-  initialCraftFairApplication,
+  isLocalCraftFairApplication,
   LocalCraftFairApplication,
   SubmittedCraftFairApplication,
 } from "../../interfaces/Applications";
@@ -31,6 +31,24 @@ export interface CraftApplicationFormProps {
 }
 
 const CraftApplicationForm: React.FC = () => {
+  const [isError, setIsError] = useState<boolean>(false);
+  const [errorDescription, setErrorDescription] = useState<string>("");
+
+  const [initialValues] = useState<
+    LocalCraftFairApplication | SubmittedCraftFairApplication | undefined
+  >(() => {
+    const currentApplication = getCurrentEditingApplication();
+    if (!currentApplication) {
+      setIsError(true);
+      setErrorDescription(
+        "Could not retrieve form to edit from local storage."
+      );
+      return;
+    } else {
+      return currentApplication;
+    }
+  });
+
   const { userProfile } = useUserProfile();
   const navigate = useNavigate();
 
@@ -39,11 +57,20 @@ const CraftApplicationForm: React.FC = () => {
     navigate("/");
   }, [navigate]);
 
+  if (isError || !initialValues) {
+    return (
+      <PageLayout>
+        <h1>Error editing application form</h1>
+        {errorDescription}
+      </PageLayout>
+    );
+  }
+
   return (
     <PageLayout>
       <h1 className="text-2xl font-black">Craft Fair Application Form</h1>
       <Formik
-        initialValues={initialCraftFairApplication}
+        initialValues={initialValues}
         validationSchema={Yup.object({
           ...CraftFairApplicationValidationSchema,
         })}
@@ -70,6 +97,18 @@ const CraftApplicationForm: React.FC = () => {
         {(formik) => {
           const totalTablesCost = getTablesCost(formik.values);
           const totalCost = getTotalCraftFairApplicationCost(formik.values);
+
+          const saveAsDraftComponent = isLocalCraftFairApplication(
+            formik.values
+          ) ? (
+            <button
+              type="button"
+              onClick={saveDraftClickedHandler}
+              className="m-4 underline"
+            >
+              Save as draft
+            </button>
+          ) : null;
 
           return (
             <form onSubmit={formik.handleSubmit} className={"text-left"}>
@@ -318,13 +357,7 @@ const CraftApplicationForm: React.FC = () => {
                 Submit Craft Fair Application
               </button>
 
-              <button
-                type="button"
-                onClick={saveDraftClickedHandler}
-                className="m-4 underline"
-              >
-                Save as draft
-              </button>
+              {saveAsDraftComponent}
             </form>
           );
         }}

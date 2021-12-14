@@ -6,6 +6,7 @@ import {
   clearCurrentEditingApplication,
   clearDraft,
   getCurrentEditingApplication,
+  saveCurrentEditingApplication,
   saveCurrentEditingApplicationAsDraft,
 } from "./LocalApplicationsStore";
 
@@ -72,6 +73,13 @@ export const submitCurrentCraftApplication = async (): Promise<void> => {
       `Status code: ${submitResponse.status} when submitting application.`
     );
   }
+};
+
+// Copy an existing submission to the edit storage ready for use by a form.
+export const prepareExistingSubmissionForEditing = (
+  application: SubmittedCraftFairApplication
+) => {
+  saveCurrentEditingApplication(application);
 };
 
 const notifyApplicationListChangeSubscribers = () => {
