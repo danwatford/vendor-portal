@@ -139,6 +139,8 @@ const CraftApplicationForm: React.FC = () => {
               />
               <TextInput name="mobile" label="Mobile phone number" type="tel" />
 
+              <TextInput name="website" label="Website" type="text" />
+
               <AddressField />
 
               <h2 className="mt-4 text-2xl font-black">Pitch selection</h2>

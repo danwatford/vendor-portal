@@ -23,6 +23,7 @@ export const sanitiseCraftApplicationFromApiClient = (
     country: application.country,
     landline: application.landline,
     mobile: application.mobile,
+    website: application.website,
     descriptionOfStall: application.descriptionOfStall,
     pitchType: application.pitchType,
     pitchAdditionalWidth: application.pitchAdditionalWidth,

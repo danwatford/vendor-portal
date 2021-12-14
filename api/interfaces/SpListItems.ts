@@ -24,6 +24,7 @@ export interface CraftFairApplicationListItem extends ListItem {
   Country: string;
   Landline: string;
   Mobile: string;
+  Website: string;
   ContactFirstName: string;
   ContactLastName: string;
   ContactEmail: string;

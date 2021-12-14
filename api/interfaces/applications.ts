@@ -51,6 +51,7 @@ export const CraftFairApplicationRunType = Record({
   country: String,
   landline: Optional(String),
   mobile: Optional(String),
+  website: Optional(String),
   descriptionOfStall: String,
   pitchType: PitchTypeRunType,
   pitchAdditionalWidth: Number,
