@@ -50,9 +50,21 @@ const ApplicationListItem = <
 
   let timestampComponent;
   if (isDraftCraftFairApplication(application)) {
-    timestampComponent = <span>Saved: {application.lastSaved}</span>;
+    timestampComponent = (
+      <span>
+        Saved:
+        <br />
+        {application.lastSaved}
+      </span>
+    );
   } else if (isSubmittedCraftFairApplication(application)) {
-    timestampComponent = <span>Submitted: {application.created}</span>;
+    timestampComponent = (
+      <span>
+        Submitted:
+        <br />
+        {application.created}
+      </span>
+    );
   }
 
   let statusComponent = null;
@@ -91,6 +103,15 @@ const ApplicationListItem = <
         </button>
       );
     }
+  } else {
+    deleteComponent = (
+      <button
+        onClick={deleteClickHandler}
+        className="m-2 w-20 self-center bg-red-600 rounded-full"
+      >
+        Delete
+      </button>
+    );
   }
 
   let controlsComponent;
