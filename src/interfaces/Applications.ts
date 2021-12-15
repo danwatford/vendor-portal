@@ -11,6 +11,7 @@ import {
 } from "runtypes";
 
 export const ApplicationStatusRunType = Union(
+  Literal("Submitted"),
   Literal("Pending Deposit"),
   Literal("Pending Document Upload"),
   Literal("Processing"),
@@ -79,6 +80,7 @@ export const SubmittedCraftFairApplicationRunType =
       contactLastName: String,
       email: String,
       created: String,
+      orderKey: Optional(String),
     })
   );
 

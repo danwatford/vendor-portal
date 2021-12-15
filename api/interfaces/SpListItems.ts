@@ -41,6 +41,8 @@ export type CraftFairApplicationListItem = ListItem & {
   Tables: number;
   TotalCost: number;
   UserId: string;
+  DepositOrderNumber?: number;
+  DepositOrderKey?: string;
 };
 
 export type PersistedCraftFairApplicationListItem =

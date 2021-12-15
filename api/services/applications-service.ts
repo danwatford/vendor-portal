@@ -1,3 +1,4 @@
+import { URL } from "url";
 import {
   CraftFairApplication,
   PersistedCraftFairApplication,
@@ -11,14 +12,17 @@ import {
   getCraftApplicationsByUserId,
   updateCraftApplicationListItem,
 } from "./applications-sp";
+import { createDepositOrder } from "./applications-woocommerce";
+import { getVendorPortalConfig } from "./configuration-service";
 
-const ApplicationServiceErrorRuntimeType = "APPLICATION_SERVICE_ERROR";
+const config = getVendorPortalConfig();
+
 export type ApplicationServiceErrorCode =
   | "APPLICATION_NOT_FOUND"
-  | "APPLICATION_CONFLICT";
+  | "APPLICATION_CONFLICT"
+  | "APPLICATION_NOT_PAYABLE";
 
 export type ApplicationServiceError<T extends ApplicationServiceErrorCode> = {
-  runtimeType: typeof ApplicationServiceErrorRuntimeType;
   code: T;
   message: string;
 };
@@ -44,7 +48,6 @@ function createError<T extends ApplicationServiceErrorCode>(
   message?: string
 ): ApplicationServiceError<T> {
   return {
-    runtimeType: ApplicationServiceErrorRuntimeType,
     code,
     message: message ?? "",
   };
@@ -60,7 +63,11 @@ export const submitCraftFairApplication = async (
   application: CraftFairApplication,
   user: User
 ): Promise<CraftFairApplication> => {
-  return createOrUpdateCraftApplication(application, user);
+  const createdOrUpdatedApplication = await createOrUpdateCraftApplication(
+    application,
+    user
+  );
+  return progressApplication(createdOrUpdatedApplication);
 };
 
 export const deleteApplication = async (
@@ -71,7 +78,10 @@ export const deleteApplication = async (
 
   if (application) {
     // Applications can only be deleted if the deposit has not yet been paid.
-    if (application.status === "Pending Deposit") {
+    if (
+      application.status === "Submitted" ||
+      application.status === "Pending Deposit"
+    ) {
       await deleteCraftApplicationListItem(application);
       return success(null);
     } else {
@@ -85,6 +95,72 @@ export const deleteApplication = async (
   }
 };
 
+export const getPaymentUrl = async (
+  dbId: number,
+  user: User
+): Promise<
+  OrError<string, "APPLICATION_NOT_FOUND" | "APPLICATION_NOT_PAYABLE">
+> => {
+  const application = await getCraftApplication(dbId, user.userId);
+
+  if (application) {
+    // Applications are only payable in certain states
+    if (application.status === "Pending Deposit") {
+      const paymentUrl = new URL(
+        `/checkout/order-pay/${application.depositOrderNumber}/`,
+        config.wcSiteUrl
+      );
+      paymentUrl.searchParams.append("pay_for_order", "true");
+      paymentUrl.searchParams.append("key", application.depositOrderKey ?? "");
+      return success(paymentUrl.href);
+    } else if (application.status === "Accepted Pending Payment") {
+      const paymentUrl = new URL(
+        `/checkout/order-pay/${application.depositOrderNumber}/`,
+        config.wcSiteUrl
+      );
+      paymentUrl.searchParams.append("pay_for_order", "true");
+      paymentUrl.searchParams.append("key", application.depositOrderKey ?? "");
+      return success(paymentUrl.href);
+    } else {
+      return fail(
+        "APPLICATION_NOT_PAYABLE",
+        "No payment currently required for application."
+      );
+    }
+  } else {
+    return fail("APPLICATION_NOT_FOUND");
+  }
+};
+
+const progressApplication = async (
+  application: PersistedCraftFairApplication
+): Promise<PersistedCraftFairApplication> => {
+  switch (application.status) {
+    case "Submitted":
+      const [error, persistedOrder] = await createDepositOrder(application);
+      if (error) {
+        switch (error.code) {
+          case "UNKNOWN_ERROR":
+            // The deposit order has not been created, therefore don't advance the status of the application.
+            // Next time the user re-submits the application there will be an attempt create the deposit order,
+            // alternatively another process may intervene.
+            return application;
+
+          default:
+            const _exhaustiveCheck: never = error.code;
+            return _exhaustiveCheck;
+        }
+      }
+      application.depositOrderNumber = persistedOrder?.number;
+      application.depositOrderKey = persistedOrder?.order_key;
+      application.status = "Pending Deposit";
+      return updateCraftApplicationListItem(application);
+
+    default:
+      return application;
+  }
+};
+
 const getCraftApplication = async (
   dbId: number,
   userId: string
@@ -95,7 +171,7 @@ const getCraftApplication = async (
 const createOrUpdateCraftApplication = async (
   craftApplication: CraftFairApplication,
   user: User
-): Promise<CraftFairApplication> => {
+): Promise<PersistedCraftFairApplication> => {
   if (craftApplication.dbId) {
     const existingApplication = await getCraftApplication(
       craftApplication.dbId,
@@ -110,7 +186,6 @@ const createOrUpdateCraftApplication = async (
         contactFirstNames: user.firstName,
         contactLastName: user.lastName,
         email: user.email,
-        status: "Pending Deposit",
         totalCost: getTotalCraftFairApplicationCost(craftApplication),
       };
 
@@ -127,7 +202,7 @@ const createOrUpdateCraftApplication = async (
     contactFirstNames: user.firstName,
     contactLastName: user.lastName,
     email: user.email,
-    status: "Pending Deposit",
+    status: "Submitted",
     totalCost: getTotalCraftFairApplicationCost(craftApplication),
   });
 };

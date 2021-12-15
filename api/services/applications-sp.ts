@@ -58,7 +58,7 @@ const getCraftApplicationsByFilter = async (
 };
 export const updateCraftApplicationListItem = async (
   application: PersistedCraftFairApplication
-): Promise<CraftFairApplication> => {
+): Promise<PersistedCraftFairApplication> => {
   const listItem = craftApplicationToListItem(application);
   await updateItem(
     vendorSiteUrl,
@@ -117,6 +117,8 @@ const craftApplicationToListItem = (
     PitchElectricalOptions: craftApplication.pitchElectricalOptions,
     CampingRequired: craftApplication.campingRequired,
     Tables: craftApplication.tables,
+    DepositOrderNumber: craftApplication.depositOrderNumber,
+    DepositOrderKey: craftApplication.depositOrderKey,
   };
 };
 
@@ -140,7 +142,7 @@ const listItemToCraftApplication = (
     tradingName: item.Title,
     status,
     addressLine1: item.AddressLine1,
-    addressLine2: item.AddressLine2 || "",
+    addressLine2: item.AddressLine2 ?? "",
     city: item.City,
     state: item.State,
     postcode: item.Postcode,
@@ -148,9 +150,9 @@ const listItemToCraftApplication = (
     contactFirstNames: item.ContactFirstName,
     contactLastName: item.ContactLastName,
     email: item.ContactEmail,
-    landline: item.Landline || "",
-    mobile: item.Mobile || "",
-    website: item.Website || "",
+    landline: item.Landline ?? "",
+    mobile: item.Mobile ?? "",
+    website: item.Website ?? "",
     descriptionOfStall: item.DescriptionOfStall,
     pitchType,
     pitchAdditionalWidth: item.PitchAdditionalWidth,
@@ -160,5 +162,7 @@ const listItemToCraftApplication = (
     totalCost: item.TotalCost,
     tables: item.Tables,
     created: item.Created,
+    depositOrderNumber: item.DepositOrderNumber ?? 0,
+    depositOrderKey: item.DepositOrderKey ?? "",
   };
 };

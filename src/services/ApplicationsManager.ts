@@ -137,6 +137,27 @@ export const deleteApplication = async (
   notifyApplicationListChangeSubscribers();
 };
 
+export const getApplicationPaymentUrl = async (
+  application: SubmittedCraftFairApplication
+) => {
+  const getPaymentUrlUrl = new URL(
+    "/api/getPaymentUrl",
+    document.location.href
+  );
+  getPaymentUrlUrl.searchParams.append("dbId", "" + application.dbId);
+
+  try {
+    const res = await fetch(getPaymentUrlUrl.href);
+    if (res.status === 200) {
+      const paymentUrl = await res.text();
+      window.open(paymentUrl, "_blank");
+    }
+  } catch (err: any) {
+    applicationsError = "Error fetching payment url from server";
+    console.error("Error fetching payment url", err);
+  }
+};
+
 const notifyApplicationListChangeSubscribers = () => {
   applicationListSubscribers.forEach((subscription) => subscription());
 };
