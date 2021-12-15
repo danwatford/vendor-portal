@@ -25,7 +25,7 @@ export const getApplications = () => applications;
 
 export const getApplicationsError = () => applicationsError;
 
-export const refreshApplicationsList = async () => {
+export const refreshApplicationsList = async (): Promise<void> => {
   refreshingApplications = true;
   applicationsError = "";
   notifyApplicationListChangeSubscribers();

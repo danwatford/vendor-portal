@@ -38,6 +38,13 @@ const httpTrigger: AzureFunction = async function (
                 body: "Application not found",
               };
               break;
+
+            case "APPLICATION_CONFLICT":
+              context.res = {
+                status: 409,
+                body: error.message,
+              };
+              break;
             default:
               const _exhaustiveCheck: never = error.code;
               return _exhaustiveCheck;

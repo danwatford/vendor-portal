@@ -17,9 +17,9 @@ const DraftApplicationsList: React.FC = () => {
     navigate("/craftApplication");
   };
 
-  const deleteClickHandler = (i: number) => {
+  const deleteClickHandler = async (i: number): Promise<void> => {
     const draft = draftApplications[i];
-    deleteApplication(draft);
+    await deleteApplication(draft);
   };
 
   const draftApplicationsCount = draftApplications.reduce(

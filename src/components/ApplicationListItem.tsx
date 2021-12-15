@@ -1,9 +1,11 @@
+import { useCallback, useState } from "react";
 import {
   isDraftCraftFairApplication,
   isSubmittedCraftFairApplication,
   DraftCraftFairApplication,
   SubmittedCraftFairApplication,
 } from "../interfaces/Applications";
+import Spinner from "./Spinner";
 
 type Appl<T extends DraftCraftFairApplication | SubmittedCraftFairApplication> =
   T extends DraftCraftFairApplication
@@ -15,7 +17,7 @@ export interface ApplicationListItemProps<
 > {
   application: Appl<T>;
   clickHandler: (application: Appl<T>) => void;
-  deleteHandler: (application: Appl<T>) => void;
+  deleteHandler: (application: Appl<T>) => Promise<void>;
 }
 
 const ApplicationListItem = <
@@ -25,11 +27,32 @@ const ApplicationListItem = <
   clickHandler,
   deleteHandler,
 }: ApplicationListItemProps<T>): JSX.Element => {
+  const [processing, setProcessing] = useState(false);
+
+  const deleteClickHandler: React.MouseEventHandler<HTMLButtonElement> =
+    useCallback(() => {
+      setProcessing(true);
+      deleteHandler(application).finally(() => {
+        setProcessing(false);
+      });
+    }, [application, deleteHandler]);
+
   let timestampComponent;
   if (isDraftCraftFairApplication(application)) {
     timestampComponent = <span>Saved: {application.lastSaved}</span>;
   } else if (isSubmittedCraftFairApplication(application)) {
     timestampComponent = <span>Submitted: {application.created}</span>;
+  }
+
+  let controlsComponent;
+  if (processing) {
+    controlsComponent = <Spinner size="sm" />;
+  } else {
+    controlsComponent = (
+      <>
+        <button onClick={deleteClickHandler}>Delete</button>
+      </>
+    );
   }
 
   return (
@@ -42,9 +65,7 @@ const ApplicationListItem = <
         <span className="block">{timestampComponent}</span>
         <span className="block">Total: £{application.totalCost}</span>
       </div>
-      <div className="">
-        <button onClick={() => deleteHandler(application)}>Delete</button>
-      </div>
+      <div className="">{controlsComponent}</div>
     </div>
   );
 };

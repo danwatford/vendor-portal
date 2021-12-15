@@ -8,7 +8,7 @@ import {
 
 export type IDraftApplicationsContext = {
   draftApplications: DraftCraftFairApplication[];
-  deleteApplication: (application: DraftCraftFairApplication) => void;
+  deleteApplication: (application: DraftCraftFairApplication) => Promise<void>;
 };
 
 const DraftApplicationsContext = React.createContext<IDraftApplicationsContext>(
@@ -42,7 +42,7 @@ const DraftApplicationsContextProvider = ({
   }, []);
 
   const deleteApplication = useCallback(
-    (application: DraftCraftFairApplication) => {
+    async (application: DraftCraftFairApplication) => {
       removeDraft(application.draftId);
     },
     []

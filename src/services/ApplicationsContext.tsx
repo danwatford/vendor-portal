@@ -14,8 +14,10 @@ export type IApplicationsContext = {
   loaded: boolean;
   applications: SubmittedCraftFairApplication[];
   error: string;
-  refreshApplications: () => void;
-  deleteApplication: (application: SubmittedCraftFairApplication) => void;
+  refreshApplications: () => Promise<void>;
+  deleteApplication: (
+    application: SubmittedCraftFairApplication
+  ) => Promise<void>;
 };
 
 const ApplicationsContext = React.createContext<IApplicationsContext>({
@@ -47,12 +49,12 @@ const ApplicationsContextProvider = ({
   const [loaded, setLoaded] = useState(() => !isRefreshingApplications());
 
   const fetchApplications = useCallback(async () => {
-    refreshApplicationsList();
+    await refreshApplicationsList();
   }, []);
 
   const deleteApplication = useCallback(
     async (application: SubmittedCraftFairApplication) => {
-      managerDeleteApplication(application);
+      await managerDeleteApplication(application);
     },
     []
   );

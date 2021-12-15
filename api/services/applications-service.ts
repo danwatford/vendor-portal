@@ -15,8 +15,7 @@ import {
 const ApplicationServiceErrorRuntimeType = "APPLICATION_SERVICE_ERROR";
 export type ApplicationServiceErrorCode =
   | "APPLICATION_NOT_FOUND"
-  | "DUMMY1"
-  | "DUMMY2";
+  | "APPLICATION_CONFLICT";
 
 export type ApplicationServiceError<T extends ApplicationServiceErrorCode> = {
   runtimeType: typeof ApplicationServiceErrorRuntimeType;
@@ -34,18 +33,20 @@ function success<T>(result: T): readonly [null, T] {
 }
 
 function fail<T extends ApplicationServiceErrorCode>(
-  code: T
+  code: T,
+  message?: string
 ): readonly [ApplicationServiceError<T>, null] {
-  return [createError(code), null];
+  return [createError(code, message), null];
 }
 
 function createError<T extends ApplicationServiceErrorCode>(
-  code: T
+  code: T,
+  message?: string
 ): ApplicationServiceError<T> {
   return {
     runtimeType: ApplicationServiceErrorRuntimeType,
     code,
-    message: "",
+    message: message ?? "",
   };
 }
 
@@ -65,12 +66,20 @@ export const submitCraftFairApplication = async (
 export const deleteApplication = async (
   dbId: number,
   user: User
-): Promise<OrError<boolean, "APPLICATION_NOT_FOUND">> => {
+): Promise<OrError<null, "APPLICATION_NOT_FOUND" | "APPLICATION_CONFLICT">> => {
   const application = await getCraftApplication(dbId, user.userId);
 
   if (application) {
-    await deleteCraftApplicationListItem(application);
-    return success(true);
+    // Applications can only be deleted if the deposit has not yet been paid.
+    if (application.status === "Pending Deposit") {
+      await deleteCraftApplicationListItem(application);
+      return success(null);
+    } else {
+      return fail(
+        "APPLICATION_CONFLICT",
+        "Cannot delete applications which are have status other than 'Pending Deposit'"
+      );
+    }
   } else {
     return fail("APPLICATION_NOT_FOUND");
   }
