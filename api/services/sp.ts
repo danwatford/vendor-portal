@@ -2,11 +2,14 @@ import { sp } from "@pnp/sp-commonjs/presets/all";
 import { Web } from "@pnp/sp-commonjs/webs";
 import { IItemAddResult, IItemUpdateResult } from "@pnp/sp-commonjs/items";
 import { SPFetchClient } from "@pnp/nodejs-commonjs";
+import { getVendorPortalConfig } from "./configuration-service";
 import { ListItem } from "../interfaces/SpListItems";
 
-const siteUrl: string = process.env.VENDORS_SITE!;
-const clientId: string = process.env.VENDORS_CLIENT_ID!;
-const clientSecret: string = process.env.VENDORS_CLIENT_SECRET!;
+const vendorPortalConfig = getVendorPortalConfig();
+
+const siteUrl: string = vendorPortalConfig.spSiteUrl;
+const clientId: string = vendorPortalConfig.spClientId;
+const clientSecret: string = vendorPortalConfig.spClientSecret;
 
 sp.setup({
   sp: {

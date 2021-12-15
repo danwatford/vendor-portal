@@ -23,6 +23,7 @@
     "@pnp/logging-commonjs": "^2.11.0",
     "@pnp/nodejs-commonjs": "^2.11.0",
     "@pnp/sp-commonjs": "^2.11.0",
+    "@woocommerce/woocommerce-rest-api": "^1.0.1",
     "cookie": "^0.4.1",
     "runtypes": "^6.5.0"
   }
