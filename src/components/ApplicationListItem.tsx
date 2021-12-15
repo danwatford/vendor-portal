@@ -58,7 +58,9 @@ const ApplicationListItem = <
   return (
     <div className="flex flex-row p-2 even:bg-yellow-50 odd:bg-yellow-100 hover:bg-yellow-200 first:rounded-t-lg last:rounded-b-lg">
       <div
-        onClick={() => clickHandler(application)}
+        onClick={() => {
+          if (!processing) clickHandler(application);
+        }}
         className="flex-auto block cursor-pointer "
       >
         <span className="block">{application.tradingName}</span>
