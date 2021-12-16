@@ -1,4 +1,5 @@
 import WooCommerceRestApi from "@reformosoftware/woocommerce-rest-api";
+import { error, OrError, success } from "../interfaces/error";
 import { PersistableOrder, PersistedOrder } from "../interfaces/woocommerce";
 
 import { getVendorPortalConfig } from "./configuration-service";
@@ -17,48 +18,48 @@ const api = new WooCommerceRestApi({
   queryStringAuth: false,
 });
 
-export type WooCommerceServiceErrorCode = "UNKNOWN_ERROR";
-
-export type WooCommerceServiceError<T extends WooCommerceServiceErrorCode> = {
-  code: T;
-  message: string;
-};
-
-type OrError<T, U extends WooCommerceServiceErrorCode> = readonly [
-  WooCommerceServiceError<U> | null,
-  T | null
-];
-
-function success<T>(result: T): readonly [null, T] {
-  return [null, result];
-}
-
-function fail<T extends WooCommerceServiceErrorCode>(
-  code: T,
-  message?: string
-): readonly [WooCommerceServiceError<T>, null] {
-  return [createError(code, message), null];
-}
-
-function createError<T extends WooCommerceServiceErrorCode>(
-  code: T,
-  message?: string
-): WooCommerceServiceError<T> {
-  return {
-    code,
-    message: message ?? "",
-  };
-}
-
 export const createOrder = async (
   order: PersistableOrder
 ): Promise<OrError<PersistedOrder, "UNKNOWN_ERROR">> => {
   const createOrderResponse = await api.post("orders", order);
 
-  console.log("Create order response", createOrderResponse);
   if (createOrderResponse.status === 201) {
     return success(createOrderResponse.data);
   } else {
-    return fail("UNKNOWN_ERROR");
+    return error("UNKNOWN_ERROR");
+  }
+};
+
+export const getOrder = async (
+  orderNumber: number
+): Promise<OrError<PersistedOrder, "NOT_FOUND" | "UNKNOWN_ERROR">> => {
+  try {
+    const getOrderResponse = await api.get("orders/" + orderNumber);
+    return success(getOrderResponse.data);
+  } catch (err) {
+    const woocommerceErrorCode = err?.response?.data?.code;
+    if (woocommerceErrorCode === "woocommerce_rest_shop_order_invalid_id") {
+      return error("NOT_FOUND");
+    } else {
+      console.error("Error while getting order", err.response);
+      return error("UNKNOWN_ERROR");
+    }
+  }
+};
+
+export const deleteOrder = async (
+  orderNumber: number
+): Promise<OrError<null, "NOT_FOUND" | "UNKNOWN_ERROR">> => {
+  try {
+    const deleteOrderResponse = await api.delete("orders/" + orderNumber);
+    return success(deleteOrderResponse.data);
+  } catch (err) {
+    const woocommerceErrorCode = err?.response?.data?.code;
+    if (woocommerceErrorCode === "woocommerce_rest_shop_order_invalid_id") {
+      return error("NOT_FOUND");
+    } else {
+      console.error("Error while deleting order", err.response);
+      return error("UNKNOWN_ERROR");
+    }
   }
 };

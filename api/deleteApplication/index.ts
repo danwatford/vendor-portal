@@ -45,6 +45,14 @@ const httpTrigger: AzureFunction = async function (
                 body: error.message,
               };
               break;
+
+            case "UNKNOWN_ERROR":
+              context.res = {
+                status: 500,
+                body: error.message,
+              };
+              break;
+
             default:
               const _exhaustiveCheck: never = error.code;
               return _exhaustiveCheck;
