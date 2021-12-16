@@ -5,7 +5,10 @@ import {
   PersistableOrder,
   PersistedOrder,
 } from "../interfaces/woocommerce";
+import { getVendorPortalConfig } from "./configuration-service";
 import { createOrder, deleteOrder, getOrder } from "./woocommerce-service";
+
+const config = getVendorPortalConfig();
 
 // Create an order in WooCommerce for payment of the deposit related to the given application.
 // Returns the URL which can be used to pay for the order.
@@ -29,12 +32,13 @@ export const createDepositOrder = async (
   const newDepositOrder: PersistableOrder = {
     billing,
     currency: "GBP",
-    fee_lines: [
+    line_items: [
       {
-        name: "Deposit for Craft Fair or Catering Vendor Application",
-        total: "100",
+        name: "Vendor deposit from portal",
+        product_id: config.wcDepositProductId,
       },
     ],
+    fee_lines: [],
     meta_data: [
       {
         key: "VendorPortalApplicationId",

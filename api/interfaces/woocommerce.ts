@@ -22,8 +22,14 @@ export type Fee = {
   total: string;
 };
 
+export type LineItem = {
+  name: string;
+  product_id: number;
+};
+
 export type PersistableOrder = {
   billing: Billing;
+  line_items: LineItem[];
   fee_lines: Fee[];
   currency: string;
   meta_data: MetadataItem[];

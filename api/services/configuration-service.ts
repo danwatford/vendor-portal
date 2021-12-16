@@ -8,6 +8,13 @@ export interface VendorPortalConfig {
   wcSecret: string;
 
   wcWebhookSecret: string;
+
+  wcDepositProductId: number;
+}
+
+function getEnvNumberOrThrow(envName: string): number {
+  const stringVal = getEnvOrThrow(envName);
+  return parseInt(stringVal);
 }
 
 function getEnvOrThrow(envName: string): string {
@@ -26,6 +33,7 @@ const config: VendorPortalConfig = {
   wcKey: getEnvOrThrow("WOOCOMMERCE_CONSUMER_KEY"),
   wcSecret: getEnvOrThrow("WOOCOMMERCE_CONSUMER_SECRET"),
   wcWebhookSecret: getEnvOrThrow("WOOCOMMERCE_WEBHOOK_SECRET"),
+  wcDepositProductId: getEnvNumberOrThrow("WOOCOMMERCE_DEPOSIT_PRODUCT_ID"),
 };
 
 export function getVendorPortalConfig(): Readonly<VendorPortalConfig> {
