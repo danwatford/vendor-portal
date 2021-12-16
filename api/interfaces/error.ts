@@ -3,7 +3,7 @@ type ErrorWrapper<T> = {
   message?: string;
 };
 
-export type OrError<T, U> = readonly [ErrorWrapper<U> | null, T | null];
+export type OrError<T, U, V = ErrorWrapper<U> | null> = readonly [V, T | null];
 
 export function success<T>(result: T): readonly [null, T] {
   return [null, result];

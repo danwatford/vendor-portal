@@ -164,8 +164,22 @@ export const logoutHandler = (req: HttpRequest): HttpResponseContextObject => {
   };
 };
 
+const getCurrentFunctionsUrl = (req: HttpRequest): string => {
+  const currentFunctionsUrl = new URL(req.headers["x-ms-original-url"] ?? "");
+
+  // If URL is http, replace with https unless it is addressing the localhost.
+  if (
+    currentFunctionsUrl.protocol === "http:" &&
+    currentFunctionsUrl.hostname !== "localhost"
+  ) {
+    currentFunctionsUrl.protocol = "https:";
+  }
+
+  return currentFunctionsUrl.href;
+};
+
 const getPostLoginUrl = (req: HttpRequest): string => {
-  const currentFunctionsUrl = req.headers["x-ms-original-url"];
+  const currentFunctionsUrl = getCurrentFunctionsUrl(req);
   const requestedPostLoginRedirectUrl = req.query.postLoginRedirectUrl;
   const referringUrl = req.headers.referer;
 
@@ -183,12 +197,12 @@ const getPostLoginUrl = (req: HttpRequest): string => {
 };
 
 const getAuthCodeRedirectUrl = (req: HttpRequest): string => {
-  const currentFunctionsUrl = req.headers["x-ms-original-url"];
+  const currentFunctionsUrl = getCurrentFunctionsUrl(req);
   return new URL("/api/redirect", currentFunctionsUrl).href;
 };
 
 const getPostLogoutUrl = (req: HttpRequest): string => {
-  const currentFunctionsUrl = req.headers["x-ms-original-url"];
+  const currentFunctionsUrl = getCurrentFunctionsUrl(req);
   return new URL("/", currentFunctionsUrl).href;
 };
 

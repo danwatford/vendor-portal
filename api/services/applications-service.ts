@@ -5,10 +5,12 @@ import {
 } from "../interfaces/applications";
 import { error, OrError, success } from "../interfaces/error";
 import { User } from "../interfaces/user";
+import { PersistedOrder } from "../interfaces/woocommerce";
 import { getTotalCraftFairApplicationCost } from "./applications-pricing";
 import {
   createCraftApplicationListItem,
   deleteCraftApplicationListItem,
+  getCraftApplicationById,
   getCraftApplicationByIdAndUserId,
   getCraftApplicationsByUserId,
   updateCraftApplicationListItem,
@@ -27,6 +29,10 @@ export type ApplicationServiceErrorCode =
   | "APPLICATION_CONFLICT"
   | "APPLICATION_NOT_PAYABLE";
 
+interface ProgressApplicationContext {
+  depositOrder?: PersistedOrder;
+}
+
 export const getCraftApplicationsForUser = async (
   userId: string
 ): Promise<CraftFairApplication[]> => {
@@ -41,7 +47,7 @@ export const submitCraftFairApplication = async (
     application,
     user
   );
-  return progressApplication(createdOrUpdatedApplication);
+  return progressApplication(createdOrUpdatedApplication, {});
 };
 
 export const deleteApplication = async (
@@ -68,7 +74,7 @@ export const deleteApplication = async (
           case "ORDER_ALREADY_PAID":
             // If the deposit has already been paid then the application should have already advanced from the Pending Deposit status.
             // Run the order progressor to get the application updated.
-            await progressApplication(application);
+            await progressApplication(application, {});
             return error(
               "APPLICATION_CONFLICT",
               "Cannot delete applications which are have status other than 'Pending Deposit'"
@@ -138,8 +144,19 @@ export const getPaymentUrl = async (
   }
 };
 
+export const depositOrderUpdatedForApplication = async (
+  id: number,
+  order: PersistedOrder
+) => {
+  const application = await getCraftApplicationById(id);
+  if (application) {
+    progressApplication(application, { depositOrder: order });
+  }
+};
+
 const progressApplication = async (
-  application: PersistedCraftFairApplication
+  application: PersistedCraftFairApplication,
+  context: ProgressApplicationContext
 ): Promise<PersistedCraftFairApplication> => {
   switch (application.status) {
     case "Submitted":
@@ -164,40 +181,51 @@ const progressApplication = async (
 
     case "Pending Deposit":
       // Check to see if an order has been created and if it has been paid.
-      const [getDepositOrderErr, depositOrder] = await getDepositOrder(
-        application
-      );
-      if (getDepositOrderErr) {
-        switch (getDepositOrderErr.code) {
-          case "UNKNOWN_ERROR":
-            // We don't know what error has occurred, so cannot make any assumptions about the existence of
-            // a deposit order.
-            // Don't progress the application further.
-            return application;
+      if (!context.depositOrder) {
+        const [getDepositOrderErr, depositOrder] = await getDepositOrder(
+          application
+        );
+        if (getDepositOrderErr) {
+          switch (getDepositOrderErr.code) {
+            case "UNKNOWN_ERROR":
+              // We don't know what error has occurred, so cannot make any assumptions about the existence of
+              // a deposit order.
+              // Don't progress the application further.
+              return application;
 
-          case "ORDER_NOT_CREATED":
-            // No order has been created, but the application has been put in the Pending Deposit status incorrectly.
-            // Progress the application as if it was in the Submitted status.
-            application.status = "Submitted";
-            return progressApplication(application);
+            case "ORDER_NOT_CREATED":
+              // No order has been created, but the application has been put in the Pending Deposit status incorrectly.
+              // Progress the application as if it was in the Submitted status.
+              application.status = "Submitted";
+              return progressApplication(application, context);
 
-          case "ORDER_NOT_FOUND":
-            // The order cannot be found. Possibly deleted. Progress the application as if it was in the Submitted status
-            // which will force creation of a new order.
-            application.status = "Submitted";
-            return progressApplication(application);
+            case "ORDER_NOT_FOUND":
+              // The order cannot be found. Possibly deleted. Progress the application as if it was in the Submitted status
+              // which will force creation of a new order.
+              application.status = "Submitted";
+              return progressApplication(application, context);
 
-          default:
-            const _exhaustiveCheck: never = getDepositOrderErr.code;
-            return _exhaustiveCheck;
+            default:
+              const _exhaustiveCheck: never = getDepositOrderErr.code;
+              return _exhaustiveCheck;
+          }
+        } else {
+          if (depositOrder) {
+            context.depositOrder = depositOrder;
+          }
         }
-      } else if (depositOrder?.status === "completed") {
-        // Deposit has been paid, therefore advance status of application.
-        application.status = "Pending Document Upload";
-        return updateCraftApplicationListItem(application);
-      } else {
-        return application;
       }
+
+      if (context.depositOrder) {
+        const depositOrder = context.depositOrder;
+
+        if (depositOrder?.status === "completed") {
+          // Deposit has been paid, therefore advance status of application.
+          application.status = "Pending Document Upload";
+          return updateCraftApplicationListItem(application);
+        }
+      }
+      return application;
 
     default:
       return application;

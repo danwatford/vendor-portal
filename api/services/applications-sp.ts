@@ -19,6 +19,17 @@ const vendorSiteUrl: string = process.env.VENDORS_SITE!;
 const vendorCraftApplicationsListGuid: string =
   process.env.VENDORS_CRAFT_APPLICATIONS_LIST_GUID!;
 
+export const getCraftApplicationById = async (
+  id: number
+): Promise<PersistedCraftFairApplication | null> => {
+  const applications = await getCraftApplicationsByFilter(`ID eq '${id}'`);
+  if (applications?.length) {
+    return applications[0];
+  } else {
+    return null;
+  }
+};
+
 export const getCraftApplicationByIdAndUserId = async (
   id: number,
   userId: string

@@ -6,6 +6,8 @@ export interface VendorPortalConfig {
   wcSiteUrl: string;
   wcKey: string;
   wcSecret: string;
+
+  wcWebhookSecret: string;
 }
 
 function getEnvOrThrow(envName: string): string {
@@ -23,6 +25,7 @@ const config: VendorPortalConfig = {
   wcSiteUrl: getEnvOrThrow("WOOCOMMERCE_SITE"),
   wcKey: getEnvOrThrow("WOOCOMMERCE_CONSUMER_KEY"),
   wcSecret: getEnvOrThrow("WOOCOMMERCE_CONSUMER_SECRET"),
+  wcWebhookSecret: getEnvOrThrow("WOOCOMMERCE_WEBHOOK_SECRET"),
 };
 
 export function getVendorPortalConfig(): Readonly<VendorPortalConfig> {
