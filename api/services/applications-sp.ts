@@ -130,6 +130,8 @@ const craftApplicationToListItem = (
     Tables: craftApplication.tables,
     DepositOrderNumber: craftApplication.depositOrderNumber,
     DepositOrderKey: craftApplication.depositOrderKey,
+    DepositAmount: craftApplication.depositAmount,
+    DepositAmountPaid: craftApplication.depositAmountPaid,
   };
 };
 
@@ -175,5 +177,7 @@ const listItemToCraftApplication = (
     created: item.Created,
     depositOrderNumber: item.DepositOrderNumber ?? 0,
     depositOrderKey: item.DepositOrderKey ?? "",
+    depositAmount: item.DepositAmount ?? undefined,
+    depositAmountPaid: item.DepositAmountPaid ?? undefined,
   };
 };

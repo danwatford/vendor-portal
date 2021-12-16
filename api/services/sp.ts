@@ -26,7 +26,7 @@ export const createItem = async <T>(
 ): Promise<IItemAddResult> => {
   const web = Web(site);
   const list = web.lists.getById(listGuid);
-  return list.usingCaching().items.add(item);
+  return list.items.add(item);
 };
 
 export const updateItem = async <T extends ListItem>(
@@ -37,7 +37,7 @@ export const updateItem = async <T extends ListItem>(
 ): Promise<IItemUpdateResult> => {
   const web = Web(site);
   const list = web.lists.getById(listGuid);
-  return list.usingCaching().items.getById(itemId).update(item);
+  return list.items.getById(itemId).update(item);
 };
 
 export const deleteItem = async (
@@ -47,7 +47,7 @@ export const deleteItem = async (
 ): Promise<void> => {
   const web = Web(site);
   const list = web.lists.getById(listGuid);
-  return list.usingCaching().items.getById(itemId).delete();
+  return list.items.getById(itemId).delete();
 };
 
 const getPagedItemsdByFilter = async <T>(
@@ -61,7 +61,7 @@ const getPagedItemsdByFilter = async <T>(
     itemsQuery = itemsQuery.filter(filter);
   }
 
-  return await itemsQuery.usingCaching().getPaged<T[]>();
+  return await itemsQuery.getPaged<T[]>();
 };
 
 export const applyToPagedItemsdByFilter = async <T, U>(

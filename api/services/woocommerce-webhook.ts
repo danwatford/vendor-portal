@@ -36,10 +36,8 @@ const processOrderUpdates = (order: PersistedOrder) => {
     const intent = getOrderMetadataValue(order, "VendorPortalOrderIntent");
 
     if (intent === "Deposit") {
-      if (order.status === "completed") {
-        // The deposit payment has been made.
-        depositOrderUpdatedForApplication(applicationId, order);
-      }
+      // The deposit payment has been made.
+      depositOrderUpdatedForApplication(applicationId, order);
     }
   }
 };

@@ -41,4 +41,5 @@ export type PersistedOrder = PersistableOrder & {
   order_key: string;
   created_via: string;
   status: string;
+  total: string;
 };
