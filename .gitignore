@@ -24,3 +24,4 @@ yarn-error.log*
 
 # Azure Static Web Apps
 local.settings.json
+.env
