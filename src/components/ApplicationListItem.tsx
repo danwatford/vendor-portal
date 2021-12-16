@@ -83,7 +83,7 @@ const ApplicationListItem = <
       deleteComponent = (
         <button
           onClick={deleteClickHandler}
-          className="m-2 w-20 self-center bg-red-600 rounded-full"
+          className="mt-4 mb-2 w-20 self-center bg-red-600 rounded-full"
         >
           Delete
         </button>
