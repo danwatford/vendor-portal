@@ -1,3 +1,8 @@
+export type MetadataItem = {
+  key: string;
+  value: string;
+};
+
 export type Billing = {
   first_name: string;
   last_name: string;
@@ -21,6 +26,7 @@ export type PersistableOrder = {
   billing: Billing;
   fee_lines: Fee[];
   currency: string;
+  meta_data: MetadataItem[];
 };
 
 export type PersistedOrder = PersistableOrder & {

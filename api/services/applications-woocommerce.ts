@@ -30,6 +30,16 @@ export const createDepositOrder = async (
         total: "100",
       },
     ],
+    meta_data: [
+      {
+        key: "VendorPortalApplicationId",
+        value: "" + application.dbId,
+      },
+      {
+        key: "VendorPortalOrderIntent",
+        value: "Deposit",
+      },
+    ],
   };
 
   return createOrder(newDepositOrder);
