@@ -17,6 +17,12 @@ export type UserListItem = ListItem & {
 
 export type PersistedUserListItem = UserListItem & PersistedListItem;
 
+type UrlField = {
+  __metadata: { type: "SP.FieldUrlValue" };
+  Description: string;
+  Url: string;
+};
+
 export type CraftFairApplicationListItem = ListItem & {
   Title: string;
   Status: string;
@@ -45,6 +51,7 @@ export type CraftFairApplicationListItem = ListItem & {
   DepositOrderKey?: string;
   DepositAmount?: number;
   DepositAmountPaid?: number;
+  DocumentFolder?: UrlField;
 };
 
 export type PersistedCraftFairApplicationListItem =

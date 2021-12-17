@@ -1,6 +1,7 @@
 import { sp } from "@pnp/sp-commonjs/presets/all";
 import { Web } from "@pnp/sp-commonjs/webs";
 import { IItemAddResult, IItemUpdateResult } from "@pnp/sp-commonjs/items";
+import { IFolderInfo } from "@pnp/sp-commonjs/folders";
 import { SPFetchClient } from "@pnp/nodejs-commonjs";
 import { getVendorPortalConfig } from "./configuration-service";
 import { ListItem } from "../interfaces/SpListItems";
@@ -89,4 +90,54 @@ export const applyToItemsByFilter = async <T, U>(
   filter?: string
 ) => {
   return applyToPagedItemsdByFilter(site, listGuid, callback, filter, false);
+};
+
+export const createFolder = async (
+  site: string,
+  libraryTitle: string,
+  folderName: string
+): Promise<string> => {
+  const web = Web(site);
+  const library = web.lists.getByTitle(libraryTitle);
+  const folder = await library.rootFolder.addSubFolderUsingPath(folderName);
+  return folder.serverRelativeUrl();
+};
+
+export const isFolderExists = async (
+  site: string,
+  libraryTitle: string,
+  folderName: string
+): Promise<[true, string] | [false]> => {
+  const web = Web(site);
+  const library = web.lists.getByTitle(libraryTitle);
+  try {
+    const folder: IFolderInfo = await library.rootFolder.folders
+      .getByName(folderName)
+      .select("Exists", "ServerRelativeUrl")
+      .get();
+    if (folder.Exists) {
+      return [true, folder.ServerRelativeUrl];
+    } else {
+      return [false];
+    }
+  } catch (e) {
+    return [false];
+  }
+};
+
+export const ensureFolder = async (
+  site: string,
+  libraryTitle: string,
+  folderName: string
+): Promise<string> => {
+  const folderExistsResult = await isFolderExists(
+    site,
+    libraryTitle,
+    folderName
+  );
+  if (folderExistsResult[0]) {
+    return folderExistsResult[1];
+  } else {
+    return createFolder(site, libraryTitle, folderName);
+  }
 };

@@ -1,6 +1,12 @@
-import { PersistedCraftFairApplication } from "../interfaces/applications";
+import {
+  ApplicationStatus,
+  PersistedCraftFairApplication,
+} from "../interfaces/applications";
 import { PersistedOrder } from "../interfaces/woocommerce";
-import { updateCraftApplicationListItem } from "./applications-sp";
+import {
+  ensureDocumentFolderForApplication,
+  updateCraftApplicationListItem,
+} from "./applications-sp";
 import {
   createDepositOrder,
   getDepositOrder,
@@ -97,9 +103,14 @@ const progressApplicationForStatusPendingDeposit = async (
 
     if (depositOrder.status === "completed") {
       // Deposit has been paid, therefore advance status of application.
-      application.status = "Pending Document Upload";
+      // Function transitionToStatus will also persist changes to the application if the transition is successful,
+      // meaning we can return here.
       application.depositAmountPaid = orderDepositTotal;
-      updateRequired = true;
+      return transitionToStatus(
+        application,
+        context,
+        "Pending Document Upload"
+      );
     }
 
     if (updateRequired) {
@@ -107,6 +118,28 @@ const progressApplicationForStatusPendingDeposit = async (
     }
   }
 
+  return application;
+};
+
+const transitionToStatus = async (
+  application: PersistedCraftFairApplication,
+  context: ProgressApplicationContext,
+  toStatus: ApplicationStatus
+): Promise<PersistedCraftFairApplication> => {
+  switch (toStatus) {
+    case "Submitted":
+      break;
+
+    case "Pending Deposit":
+      break;
+
+    case "Pending Document Upload":
+      application.documentFolder = await ensureDocumentFolderForApplication(
+        application
+      );
+      application.status = "Pending Document Upload";
+      return updateCraftApplicationListItem(application);
+  }
   return application;
 };
 

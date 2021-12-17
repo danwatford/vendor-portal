@@ -76,6 +76,7 @@ export const PersistableCraftFairApplicationRunType =
       depositOrderKey: Optional(String),
       depositAmount: Optional(Number),
       depositAmountPaid: Optional(Number),
+      documentFolder: Optional(String),
     })
   );
 

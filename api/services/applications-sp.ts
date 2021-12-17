@@ -13,7 +13,13 @@ import {
   CraftFairApplicationListItem,
   PersistedCraftFairApplicationListItem,
 } from "../interfaces/SpListItems";
-import { applyToItemsByFilter, createItem, deleteItem, updateItem } from "./sp";
+import {
+  applyToItemsByFilter,
+  createItem,
+  deleteItem,
+  ensureFolder,
+  updateItem,
+} from "./sp";
 
 const vendorSiteUrl: string = process.env.VENDORS_SITE!;
 const vendorCraftApplicationsListGuid: string =
@@ -67,6 +73,7 @@ const getCraftApplicationsByFilter = async (
     filter
   );
 };
+
 export const updateCraftApplicationListItem = async (
   application: PersistedCraftFairApplication
 ): Promise<PersistedCraftFairApplication> => {
@@ -101,6 +108,19 @@ export const deleteCraftApplicationListItem = async (
   );
 };
 
+export const ensureDocumentFolderForApplication = async (
+  application: PersistedCraftFairApplication
+): Promise<string> => {
+  const folderName = `${application.dbId} - ${application.tradingName}`;
+  const folderServerRelativeUrl = await ensureFolder(
+    vendorSiteUrl,
+    "Application Documents",
+    folderName
+  );
+
+  return new URL(folderServerRelativeUrl, vendorSiteUrl).href;
+};
+
 const craftApplicationToListItem = (
   craftApplication: PersistableCraftFairApplication
 ): CraftFairApplicationListItem => {
@@ -132,6 +152,13 @@ const craftApplicationToListItem = (
     DepositOrderKey: craftApplication.depositOrderKey,
     DepositAmount: craftApplication.depositAmount,
     DepositAmountPaid: craftApplication.depositAmountPaid,
+    DocumentFolder: craftApplication.documentFolder
+      ? {
+          __metadata: { type: "SP.FieldUrlValue" },
+          Description: "Related Documents",
+          Url: craftApplication.documentFolder,
+        }
+      : undefined,
   };
 };
 
