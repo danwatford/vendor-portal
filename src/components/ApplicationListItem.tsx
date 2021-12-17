@@ -93,6 +93,25 @@ const applicationPitchDescriptionComponents = (
     );
   }
 
+  if (application.tables) {
+    retArray.push(<span className="block">{application.tables} table(s)</span>);
+  }
+
+  if (isSubmittedCraftFairApplication(application)) {
+    if (application.depositAmount) {
+      retArray.push(
+        <span className="block">Deposit due: £{application.depositAmount}</span>
+      );
+    }
+    if (application.depositAmountPaid) {
+      retArray.push(
+        <span className="block">
+          Deposit paid: £{application.depositAmountPaid}
+        </span>
+      );
+    }
+  }
+
   return retArray;
 };
 
@@ -160,7 +179,7 @@ const ApplicationControls = <T extends EitherApplication>({
   const deleteComponent = isDeletable(application) ? (
     <button
       onClick={deleteClickedHander}
-      className="w-full px-4 py-2 self-center bg-red-400 rounded-full"
+      className="w-full py-2 self-center bg-red-400 rounded-full"
     >
       {" "}
       Delete
@@ -170,7 +189,7 @@ const ApplicationControls = <T extends EitherApplication>({
   const paymentComponent = isPayable(application) ? (
     <button
       onClick={payClickedHandler}
-      className="w-full px-4 py-2 self-center bg-green-300 rounded-full"
+      className="w-full py-2 self-center bg-green-300 rounded-full"
     >
       Pay now
     </button>
@@ -255,6 +274,25 @@ const ApplicationListItem = <T extends EitherApplication>({
         and then submit to Broadstairs Folk Week.
       </div>
     );
+  }
+
+  if (isSubmittedCraftFairApplication(application)) {
+    if (
+      application.status === "Submitted" ||
+      application.status === "Pending Deposit"
+    ) {
+      actionRequiredComponent = (
+        <div>
+          ACTION Required:
+          <button onClick={payClickHandler} className="mx-1 underline">
+            Deposit payment
+          </button>
+          <br></br>
+          It may take a few minutes for your deposit payment to show here.
+          Please click refresh a few minutes after making your payment.
+        </div>
+      );
+    }
   }
 
   return (

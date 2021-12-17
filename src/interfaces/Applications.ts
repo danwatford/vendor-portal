@@ -81,6 +81,8 @@ export const SubmittedCraftFairApplicationRunType =
       email: String,
       created: String,
       orderKey: Optional(String),
+      depositAmount: Optional(Number),
+      depositAmountPaid: Optional(Number),
     })
   );
 
