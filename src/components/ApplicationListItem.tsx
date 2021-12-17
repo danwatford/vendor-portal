@@ -1,145 +1,276 @@
-import { useCallback, useState } from "react";
+import { PropsWithChildren, useCallback, useState } from "react";
+import { DateTime } from "luxon";
 import {
   isDraftCraftFairApplication,
   isSubmittedCraftFairApplication,
   DraftCraftFairApplication,
   SubmittedCraftFairApplication,
+  PitchType,
 } from "../interfaces/Applications";
-import { getApplicationPaymentUrl } from "../services/ApplicationsManager";
+import { openApplicationPaymentUrl } from "../services/ApplicationsManager";
 import Spinner from "./Spinner";
 
-type Appl<T extends DraftCraftFairApplication | SubmittedCraftFairApplication> =
+type EitherApplication =
+  | DraftCraftFairApplication
+  | SubmittedCraftFairApplication;
+
+type ConditionalApplication<T extends EitherApplication> =
   T extends DraftCraftFairApplication
     ? DraftCraftFairApplication
     : SubmittedCraftFairApplication;
 
-export interface ApplicationListItemProps<
-  T extends DraftCraftFairApplication | SubmittedCraftFairApplication
-> {
-  application: Appl<T>;
-  clickHandler: (application: Appl<T>) => void;
-  deleteHandler: (application: Appl<T>) => Promise<void>;
+export interface ApplicationListItemProps<T extends EitherApplication> {
+  application: ConditionalApplication<T>;
+  clickHandler: (application: ConditionalApplication<T>) => void;
+  deleteHandler: (application: ConditionalApplication<T>) => Promise<void>;
 }
 
-const ApplicationListItem = <
-  T extends DraftCraftFairApplication | SubmittedCraftFairApplication
->({
+interface ApplicationControlsProps<T extends EitherApplication> {
+  application: ConditionalApplication<T>;
+  deleteClickedHander: React.MouseEventHandler<HTMLButtonElement>;
+  payClickedHandler: React.MouseEventHandler<HTMLButtonElement>;
+}
+
+const ApplicationHeader = <T extends EitherApplication>({
+  application,
+  children,
+}: PropsWithChildren<{
+  application: ConditionalApplication<T>;
+}>) => {
+  const statusText = isSubmittedCraftFairApplication(application)
+    ? application.status
+    : "Draft";
+
+  return (
+    <div className="bg-bfw-yellow">
+      <div className="flex flex-row justify-between p-2 bg-bfw-yellow text-xs whitespace-nowrap">
+        <div>Craft fair application</div>
+        <div>{statusText}</div>
+      </div>
+      <div className="px-2">{children}</div>
+    </div>
+  );
+};
+
+const pitchDescriptions: Readonly<Record<PitchType, string>> = {
+  standardNoShelter: "Standard 3m wide x 3m deep pitch / No shelter",
+  extraLargeNoShelter: "Extra-large 4.5m wide x 3m deep pitch / No shelter",
+  standardInMarquee: "Standard 3m wide x 3m deep pitch / Marquee",
+  doubleInMarquee: "Double Width 6m wide x 3m deep pitch / Marquee",
+};
+
+const applicationPitchDescriptionComponents = (
+  application: EitherApplication
+) => {
+  const retArray = [];
+
+  retArray.push(
+    <span className="block">{pitchDescriptions[application.pitchType]}</span>
+  );
+
+  if (
+    application.pitchType === "standardNoShelter" ||
+    application.pitchType === "extraLargeNoShelter"
+  ) {
+    retArray.push(
+      <span className="block">
+        Additional width (metres): {application.pitchAdditionalWidth}
+      </span>
+    );
+  }
+
+  if (application.pitchType === "extraLargeNoShelter") {
+    retArray.push(<span className="block">Space for van required</span>);
+  }
+
+  if (application.campingRequired) {
+    retArray.push(<span className="block">Camping (max 2 persons)</span>);
+  }
+
+  if (application.pitchElectricalOptions !== "none") {
+    retArray.push(
+      <span className="block">{application.pitchElectricalOptions}</span>
+    );
+  }
+
+  return retArray;
+};
+
+const ApplicationInfo = <T extends EitherApplication>({
+  application,
+}: {
+  application: ConditionalApplication<T>;
+}) => {
+  let timestampLabel;
+  let dateTime: DateTime;
+  if (isDraftCraftFairApplication(application)) {
+    timestampLabel = "Saved";
+    dateTime = DateTime.fromISO(application.lastSaved);
+  } else {
+    const submittedApplication = application as SubmittedCraftFairApplication;
+    timestampLabel = "Submitted";
+    dateTime = DateTime.fromISO(submittedApplication.created);
+  }
+
+  const timestampComponent = (
+    <span className="text-sm">
+      {timestampLabel} {dateTime.toLocaleString(DateTime.DATETIME_MED)}
+    </span>
+  );
+
+  return (
+    <>
+      <span className="block font-bold">{application.tradingName}</span>
+      <span className="block">{timestampComponent}</span>
+      {applicationPitchDescriptionComponents(application)}
+      <span className="block font-bold">Total: £{application.totalCost}</span>
+    </>
+  );
+};
+
+const isDeletable = (application: EitherApplication): boolean => {
+  if (isSubmittedCraftFairApplication(application)) {
+    return (
+      application.status === "Submitted" ||
+      application.status === "Pending Deposit"
+    );
+  } else {
+    // Draft applications are always deletable.
+    return true;
+  }
+};
+
+const isPayable = (application: EitherApplication): boolean => {
+  if (isSubmittedCraftFairApplication(application)) {
+    return (
+      application.status === "Pending Deposit" ||
+      application.status === "Accepted Pending Payment"
+    );
+  } else {
+    // Unsubmitted applications cannot be paid for.
+    return false;
+  }
+};
+
+const ApplicationControls = <T extends EitherApplication>({
+  application,
+  deleteClickedHander,
+  payClickedHandler,
+}: ApplicationControlsProps<T>) => {
+  const deleteComponent = isDeletable(application) ? (
+    <button
+      onClick={deleteClickedHander}
+      className="w-full px-4 py-2 self-center bg-red-400 rounded-full"
+    >
+      {" "}
+      Delete
+    </button>
+  ) : null;
+
+  const paymentComponent = isPayable(application) ? (
+    <button
+      onClick={payClickedHandler}
+      className="w-full px-4 py-2 self-center bg-green-300 rounded-full"
+    >
+      Pay now
+    </button>
+  ) : null;
+
+  return (
+    <>
+      <div className="flex flex-col gap-2 text-center">
+        {paymentComponent}
+        {deleteComponent}
+      </div>
+    </>
+  );
+};
+
+const ApplicationListItem = <T extends EitherApplication>({
   application,
   clickHandler,
   deleteHandler,
 }: ApplicationListItemProps<T>): JSX.Element => {
   const [processing, setProcessing] = useState(false);
 
-  const deleteClickHandler: React.MouseEventHandler<HTMLButtonElement> =
-    useCallback(() => {
-      setProcessing(true);
-      deleteHandler(application).finally(() => {
-        setProcessing(false);
-      });
-    }, [application, deleteHandler]);
+  const itemSelectedHandler = useCallback(() => {
+    if (!processing) {
+      clickHandler(application);
+    }
+  }, [application, clickHandler, processing]);
 
-  const payClickHandler: React.MouseEventHandler<HTMLButtonElement> =
-    useCallback(() => {
-      if (isSubmittedCraftFairApplication(application)) {
+  const deleteClickedHandler: React.MouseEventHandler<HTMLButtonElement> =
+    useCallback(
+      (ev) => {
+        // Stop event propagation since we also have a click handler on the whole ApplicationListItem component.
+        ev.stopPropagation();
+
         setProcessing(true);
-        getApplicationPaymentUrl(application).finally(() => {
+        deleteHandler(application).finally(() => {
           setProcessing(false);
         });
-      }
-    }, [application]);
-
-  let timestampComponent;
-  if (isDraftCraftFairApplication(application)) {
-    timestampComponent = (
-      <span>
-        Saved:
-        <br />
-        {application.lastSaved}
-      </span>
-    );
-  } else if (isSubmittedCraftFairApplication(application)) {
-    timestampComponent = (
-      <span>
-        Submitted:
-        <br />
-        {application.created}
-      </span>
-    );
-  }
-
-  let statusComponent = null;
-  let paymentComponent = null;
-  let deleteComponent = null;
-
-  if (isSubmittedCraftFairApplication(application)) {
-    statusComponent = (
-      <div className="p-2 bg-bfw-yellow">{application.status}</div>
+      },
+      [application, deleteHandler]
     );
 
-    if (
-      application.status === "Submitted" ||
-      application.status === "Pending Deposit"
-    ) {
-      deleteComponent = (
-        <button
-          onClick={deleteClickHandler}
-          className="mt-4 mb-2 w-20 self-center bg-red-600 rounded-full"
-        >
-          Delete
-        </button>
-      );
-    }
+  const payClickHandler: React.MouseEventHandler<HTMLButtonElement> =
+    useCallback(
+      (ev) => {
+        // Stop event propagation since we also have a click handler on the whole ApplicationListItem component.
+        ev.stopPropagation();
 
-    if (
-      application.status === "Pending Deposit" ||
-      application.status === "Accepted Pending Payment"
-    ) {
-      paymentComponent = (
-        <button
-          onClick={payClickHandler}
-          className="m-2 w-20 self-center bg-green-300 rounded-full"
-        >
-          Pay now
-        </button>
-      );
-    }
-  } else {
-    deleteComponent = (
-      <button
-        onClick={deleteClickHandler}
-        className="m-2 w-20 self-center bg-red-600 rounded-full"
-      >
-        Delete
-      </button>
+        if (isSubmittedCraftFairApplication(application)) {
+          setProcessing(true);
+          openApplicationPaymentUrl(application).finally(() => {
+            setProcessing(false);
+          });
+        }
+      },
+      [application]
     );
-  }
 
   let controlsComponent;
   if (processing) {
     controlsComponent = <Spinner size="sm" />;
   } else {
     controlsComponent = (
-      <div className="flex flex-col text-center w-40">
-        {statusComponent}
-        {paymentComponent}
-        {deleteComponent}
+      <div className="text-center">
+        <ApplicationControls
+          application={application}
+          deleteClickedHander={deleteClickedHandler}
+          payClickedHandler={payClickHandler}
+        />
+      </div>
+    );
+  }
+
+  let actionRequiredComponent;
+  if (isDraftCraftFairApplication(application)) {
+    actionRequiredComponent = (
+      <div>
+        ACTION Required: When ready,{" "}
+        <button onClick={itemSelectedHandler} className="underline">
+          select this application to edit it
+        </button>{" "}
+        and then submit to Broadstairs Folk Week.
       </div>
     );
   }
 
   return (
-    <div className="flex flex-row even:bg-yellow-50 odd:bg-yellow-100 hover:bg-yellow-200 first:rounded-t-lg last:rounded-b-lg">
-      <div
-        onClick={() => {
-          if (!processing) clickHandler(application);
-        }}
-        className="flex-auto block p-2 cursor-pointer "
-      >
-        <span className="block">{application.tradingName}</span>
-        <span className="block">{timestampComponent}</span>
-        <span className="block">Total: £{application.totalCost}</span>
+    <div
+      onClick={() => itemSelectedHandler()}
+      className="flex flex-col -mb-4 pb-4 even:ml-2 odd:mr-2 even:bg-yellow-50 odd:bg-yellow-100 hover:bg-yellow-200 rounded-lg overflow-hidden cursor-pointer"
+    >
+      <ApplicationHeader application={application}>
+        {actionRequiredComponent}
+      </ApplicationHeader>
+      <div className="flex flex-row">
+        <div className="flex-auto p-4">
+          <ApplicationInfo application={application} />
+        </div>
+        <div className="py-4 pr-2 w-32">{controlsComponent}</div>
       </div>
-      <div className="">{controlsComponent}</div>
     </div>
   );
 };

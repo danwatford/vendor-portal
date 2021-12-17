@@ -33,9 +33,6 @@ export const clearDraftFromStore = (draftId: number) => {
 };
 
 export const writeDraftToStore = (application: DraftCraftFairApplication) => {
-  const currentDateTime = new Date();
-  application.lastSaved = currentDateTime.toLocaleString();
-
   const drafts: Array<DraftCraftFairApplication | null> = getDraftsFromStore();
   let index = application.draftId;
   drafts[index] = application;

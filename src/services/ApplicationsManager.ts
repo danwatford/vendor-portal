@@ -137,7 +137,7 @@ export const deleteApplication = async (
   notifyApplicationListChangeSubscribers();
 };
 
-export const getApplicationPaymentUrl = async (
+export const openApplicationPaymentUrl = async (
   application: SubmittedCraftFairApplication
 ) => {
   const getPaymentUrlUrl = new URL(

@@ -1,3 +1,4 @@
+import { DateTime } from "luxon";
 import {
   initialCraftFairApplication,
   isSubmittedCraftFairApplication,
@@ -79,8 +80,8 @@ export const removeDraft = (draftId: number) => {
 };
 
 const updateDraft = (application: DraftCraftFairApplication) => {
-  const currentDateTime = new Date();
-  application.lastSaved = currentDateTime.toLocaleString();
+  const currentDateTime = DateTime.now();
+  application.lastSaved = currentDateTime.toISO();
 
   writeDraftToStore(application);
 };

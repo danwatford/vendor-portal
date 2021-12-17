@@ -14,7 +14,7 @@ const SubmittedApplicationsList: React.FC = () => {
     applicationsComponents = <div>Error retrieving submitted applications</div>;
   } else if (!loaded) {
     applicationsComponents = <div>Loading applications...</div>;
-  } else if (!applications) {
+  } else if (!applications || applications.length === 0) {
     applicationsComponents = <div>No applications</div>;
   } else {
     const clickHandler = (application: SubmittedCraftFairApplication) => {
