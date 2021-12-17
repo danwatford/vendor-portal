@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { SubmittedCraftFairApplication } from "../interfaces/Applications";
 import { useApplications } from "../services/ApplicationsContext";
@@ -5,8 +6,30 @@ import { prepareExistingSubmissionForEditing } from "../services/ApplicationsMan
 import ApplicationListItem from "./ApplicationListItem";
 
 const SubmittedApplicationsList: React.FC = () => {
-  const { loaded, applications, error, deleteApplication } = useApplications();
+  const {
+    loaded,
+    applications,
+    error,
+    deleteApplication,
+    setCurrentApplication,
+  } = useApplications();
   const navigate = useNavigate();
+
+  const clickHandler = useCallback(
+    (application: SubmittedCraftFairApplication) => {
+      prepareExistingSubmissionForEditing(application);
+      navigate("/craftApplication");
+    },
+    [navigate]
+  );
+
+  const uploadClickedHandler = useCallback(
+    (application: SubmittedCraftFairApplication) => {
+      setCurrentApplication(application);
+      navigate("/uploadDocuments");
+    },
+    [navigate, setCurrentApplication]
+  );
 
   let applicationsComponents;
 
@@ -17,17 +40,13 @@ const SubmittedApplicationsList: React.FC = () => {
   } else if (!applications || applications.length === 0) {
     applicationsComponents = <div>No applications</div>;
   } else {
-    const clickHandler = (application: SubmittedCraftFairApplication) => {
-      prepareExistingSubmissionForEditing(application);
-      navigate("/craftApplication");
-    };
-
     applicationsComponents = applications.map((application, index) => (
       <ApplicationListItem
         key={index}
         application={application}
         clickHandler={() => clickHandler(application)}
         deleteHandler={() => deleteApplication(application)}
+        uploadHandler={() => uploadClickedHandler(application)}
       />
     ));
   }

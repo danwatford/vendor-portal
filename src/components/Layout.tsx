@@ -6,6 +6,8 @@ import Spinner from "./Spinner";
 import CraftApplicationForm from "./forms/CraftApplicationForm";
 import SubmittingCraftApplication from "./SubmittingCraftApplication";
 import { useEffect } from "react";
+import { useApplications } from "../services/ApplicationsContext";
+import UploadDocuments from "./forms/UploadDocuments";
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -19,6 +21,7 @@ const ScrollToTop = () => {
 
 const Layout: React.FC = () => {
   const { loaded } = useUserProfile();
+  const { currentApplication } = useApplications();
 
   if (!loaded) {
     return (
@@ -41,6 +44,9 @@ const Layout: React.FC = () => {
           path="/submittingCraftApplication"
           element={<SubmittingCraftApplication />}
         />
+        {!!currentApplication ? (
+          <Route path="/uploadDocuments" element={<UploadDocuments />} />
+        ) : null}
       </Routes>
     </>
   );

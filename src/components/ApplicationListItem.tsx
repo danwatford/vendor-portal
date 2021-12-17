@@ -23,12 +23,14 @@ export interface ApplicationListItemProps<T extends EitherApplication> {
   application: ConditionalApplication<T>;
   clickHandler: (application: ConditionalApplication<T>) => void;
   deleteHandler: (application: ConditionalApplication<T>) => Promise<void>;
+  uploadHandler: (application: ConditionalApplication<T>) => void;
 }
 
 interface ApplicationControlsProps<T extends EitherApplication> {
   application: ConditionalApplication<T>;
   deleteClickedHander: React.MouseEventHandler<HTMLButtonElement>;
   payClickedHandler: React.MouseEventHandler<HTMLButtonElement>;
+  uploadClickedHandler: React.MouseEventHandler<HTMLButtonElement>;
 }
 
 const ApplicationHeader = <T extends EitherApplication>({
@@ -171,10 +173,19 @@ const isPayable = (application: EitherApplication): boolean => {
   }
 };
 
+const isDocumentsUploadable = (application: EitherApplication): boolean => {
+  if (isSubmittedCraftFairApplication(application)) {
+    return application.status === "Pending Document Upload";
+  } else {
+    return false;
+  }
+};
+
 const ApplicationControls = <T extends EitherApplication>({
   application,
   deleteClickedHander,
   payClickedHandler,
+  uploadClickedHandler,
 }: ApplicationControlsProps<T>) => {
   const deleteComponent = isDeletable(application) ? (
     <button
@@ -195,11 +206,21 @@ const ApplicationControls = <T extends EitherApplication>({
     </button>
   ) : null;
 
+  const uploadComponent = isDocumentsUploadable(application) ? (
+    <button
+      onClick={uploadClickedHandler}
+      className="w-full py-2 self-center bg-green-300 rounded-full"
+    >
+      Upload Documents
+    </button>
+  ) : null;
+
   return (
     <>
       <div className="flex flex-col gap-2 text-center">
         {paymentComponent}
         {deleteComponent}
+        {uploadComponent}
       </div>
     </>
   );
@@ -209,6 +230,7 @@ const ApplicationListItem = <T extends EitherApplication>({
   application,
   clickHandler,
   deleteHandler,
+  uploadHandler,
 }: ApplicationListItemProps<T>): JSX.Element => {
   const [processing, setProcessing] = useState(false);
 
@@ -248,6 +270,21 @@ const ApplicationListItem = <T extends EitherApplication>({
       [application]
     );
 
+  const uploadClickHandler: React.MouseEventHandler<HTMLButtonElement> =
+    useCallback(
+      (ev) => {
+        // Stop event propagation since we also have a click handler on the whole ApplicationListItem component.
+        ev.stopPropagation();
+
+        if (isSubmittedCraftFairApplication(application)) {
+          setProcessing(true);
+          uploadHandler(application);
+          setProcessing(false);
+        }
+      },
+      [application, uploadHandler]
+    );
+
   let controlsComponent;
   if (processing) {
     controlsComponent = <Spinner size="sm" />;
@@ -258,6 +295,7 @@ const ApplicationListItem = <T extends EitherApplication>({
           application={application}
           deleteClickedHander={deleteClickedHandler}
           payClickedHandler={payClickHandler}
+          uploadClickedHandler={uploadClickHandler}
         />
       </div>
     );
@@ -290,6 +328,16 @@ const ApplicationListItem = <T extends EitherApplication>({
           <br></br>
           It may take a few minutes for your deposit payment to show here.
           Please click refresh a few minutes after making your payment.
+        </div>
+      );
+    } else if (application.status === "Pending Document Upload") {
+      actionRequiredComponent = (
+        <div>
+          ACTION Required:{" "}
+          <button onClick={uploadClickHandler} className="underline">
+            Upload supporting documents/images.
+          </button>{" "}
+          for your application
         </div>
       );
     }

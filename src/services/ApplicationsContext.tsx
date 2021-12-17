@@ -14,26 +14,29 @@ export type IApplicationsContext = {
   loaded: boolean;
   applications: SubmittedCraftFairApplication[];
   error: string;
+  currentApplication: SubmittedCraftFairApplication | null;
+  setCurrentApplication: (application: SubmittedCraftFairApplication) => void;
+  clearCurrentApplication: () => void;
   refreshApplications: () => Promise<void>;
   deleteApplication: (
     application: SubmittedCraftFairApplication
   ) => Promise<void>;
 };
 
+const invalidFunction = () => {
+  throw new Error(
+    "ApplicationsContext consumer is not wrapped in a corresponding provider."
+  );
+};
 const ApplicationsContext = React.createContext<IApplicationsContext>({
   loaded: false,
   applications: [],
   error: "",
-  refreshApplications: () => {
-    throw new Error(
-      "ApplicationsContext consumer is not wrapped in a corresponding provider."
-    );
-  },
-  deleteApplication: () => {
-    throw new Error(
-      "ApplicationsContext consumer is not wrapped in a corresponding provider."
-    );
-  },
+  currentApplication: null,
+  setCurrentApplication: invalidFunction,
+  clearCurrentApplication: invalidFunction,
+  refreshApplications: invalidFunction,
+  deleteApplication: invalidFunction,
 });
 
 const ApplicationsContextProvider = ({
@@ -47,6 +50,8 @@ const ApplicationsContextProvider = ({
   >(() => getApplications());
   const [error, setError] = useState<string>(() => getApplicationsError());
   const [loaded, setLoaded] = useState(() => !isRefreshingApplications());
+  const [currentApplication, setCurrentApplication] =
+    useState<SubmittedCraftFairApplication | null>(null);
 
   const fetchApplications = useCallback(async () => {
     await refreshApplicationsList();
@@ -81,6 +86,11 @@ const ApplicationsContextProvider = ({
         loaded,
         applications,
         error,
+        currentApplication,
+        setCurrentApplication,
+        clearCurrentApplication: () => {
+          setCurrentApplication(null);
+        },
         refreshApplications: fetchApplications,
         deleteApplication,
       }}

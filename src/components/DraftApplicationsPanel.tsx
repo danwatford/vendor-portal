@@ -43,6 +43,7 @@ const DraftApplicationsList: React.FC = () => {
         application={application}
         clickHandler={() => clickHandler(index)}
         deleteHandler={() => deleteClickHandler(index)}
+        uploadHandler={() => {}}
       />
     ));
   }
