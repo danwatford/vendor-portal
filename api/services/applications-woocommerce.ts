@@ -34,7 +34,7 @@ export const createDepositOrder = async (
     currency: "GBP",
     line_items: [
       {
-        name: "Vendor deposit from portal",
+        name: "Deposit for application for a craft fair or catering pitch at Broadstairs Folk Week.",
         product_id: config.wcDepositProductId,
       },
     ],
