@@ -14,6 +14,7 @@ import {
   PersistedCraftFairApplicationListItem,
 } from "../interfaces/SpListItems";
 import {
+  addFileToFolder,
   applyToItemsByFilter,
   createItem,
   deleteItem,
@@ -121,6 +122,24 @@ export const ensureDocumentFolderForApplication = async (
   return new URL(folderServerRelativeUrl, vendorSiteUrl).href;
 };
 
+export const addFileToApplication = async (
+  application: PersistedCraftFairApplication,
+  fileName: string,
+  content: Buffer
+): Promise<void> => {
+  if (application.documentFolder) {
+    const documentFolderUrl = new URL(application.documentFolder);
+    const documentFolderServerRelativeUrl = documentFolderUrl.pathname;
+
+    await addFileToFolder(
+      vendorSiteUrl,
+      documentFolderServerRelativeUrl,
+      fileName,
+      content
+    );
+  }
+};
+
 const craftApplicationToListItem = (
   craftApplication: PersistableCraftFairApplication
 ): CraftFairApplicationListItem => {
@@ -206,5 +225,6 @@ const listItemToCraftApplication = (
     depositOrderKey: item.DepositOrderKey ?? "",
     depositAmount: item.DepositAmount ?? undefined,
     depositAmountPaid: item.DepositAmountPaid ?? undefined,
+    documentFolder: item.DocumentFolder?.Url ?? undefined,
   };
 };

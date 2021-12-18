@@ -1,21 +1,46 @@
-import { Formik } from "formik";
-import { ChangeEventHandler, useState } from "react";
-// import { useApplications } from "../../services/ApplicationsContext";
+import { ChangeEventHandler, useCallback, useState } from "react";
+import { useApplications } from "../../services/ApplicationsContext";
 import PageLayout from "../PageLayout";
 
 export interface UploadDocumentProps {}
 
-type FormValues = {
-  file: File | null;
-};
-
 const UploadDocuments: React.FC<UploadDocumentProps> = () => {
-  // const { currentApplication } = useApplications();
+  const { currentApplication } = useApplications();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const initialValues: FormValues = {
-    file: null,
-  };
+  const uploadFileClickedHandler = useCallback(() => {
+    if (selectedFile && currentApplication) {
+      const formData = new FormData();
+      formData.append("uploadFile", selectedFile);
+      formData.append("dbId", "" + currentApplication.dbId);
+
+      fetch("/api/uploadFile", {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => {
+          console.log("Upload response", response);
+        })
+        .catch((err) => console.error("Error uploading file", err));
+    }
+  }, [selectedFile, currentApplication]);
+
+  const fileChangedHandler: ChangeEventHandler<HTMLInputElement> = useCallback(
+    (ev) => {
+      const targetFiles = ev.currentTarget?.files;
+      if (!targetFiles) {
+        setSelectedFile(null);
+      } else {
+        const targetFile: File = targetFiles[0];
+        setSelectedFile(targetFile);
+      }
+    },
+    []
+  );
+
+  if (!currentApplication) {
+    return null;
+  }
 
   return (
     <PageLayout>
@@ -37,67 +62,29 @@ const UploadDocuments: React.FC<UploadDocumentProps> = () => {
         </div>
       </div>
 
-      <Formik
-        initialValues={initialValues}
-        onSubmit={(values) => {
-          if (selectedFile) {
-            alert(
-              JSON.stringify(
-                {
-                  fileName: selectedFile.name,
-                  type: selectedFile.type,
-                  size: `${selectedFile.size} bytes`,
-                },
-                null,
-                2
-              )
-            );
-          } else {
-            alert("None");
-          }
-        }}
-      >
-        {(formik) => {
-          const fileChangeHandler: ChangeEventHandler<HTMLInputElement> = (
-            ev
-          ) => {
-            const targetFiles = ev.currentTarget?.files;
-            if (!targetFiles) {
-              setSelectedFile(null);
-            } else {
-              const targetFile: File = targetFiles[0];
-              setSelectedFile(targetFile);
-            }
-          };
-
-          return (
-            <form onSubmit={formik.handleSubmit} className="p-2 text-left">
-              <div>
-                {selectedFile === null
-                  ? "Selected file IS null"
-                  : "Selected file NOT null"}
-              </div>
-              <label htmlFor="file">File upload</label>
-              <div className="w-full p-2 border-2 border-gray-300 shadow-sm">
-                <input
-                  id="file"
-                  name="file"
-                  type="file"
-                  onChange={fileChangeHandler}
-                  className="form-control"
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={!selectedFile}
-                className="block m-auto my-4 p-4 bg-bfw-yellow hover:bg-bfw-link rounded text-lg text-menu-text"
-              >
-                Upload file
-              </button>
-            </form>
-          );
-        }}
-      </Formik>
+      <div>
+        <div className="w-full p-2 border-2 border-gray-300 shadow-sm text-left">
+          <input
+            id="file"
+            name="file"
+            type="file"
+            onChange={fileChangedHandler}
+            className="form-control"
+          />
+        </div>
+        <button
+          type="submit"
+          disabled={!selectedFile}
+          onClick={uploadFileClickedHandler}
+          className={`block m-auto my-4 p-4 w-80 ${
+            selectedFile ? "bg-bfw-yellow hover:bg-bfw-link" : "bg-gray-200"
+          } rounded text-lg text-menu-text`}
+        >
+          {selectedFile
+            ? "Upload file"
+            : "Please select the Choose File button"}
+        </button>
+      </div>
     </PageLayout>
   );
 };

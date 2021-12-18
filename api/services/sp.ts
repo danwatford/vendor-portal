@@ -141,3 +141,18 @@ export const ensureFolder = async (
     return createFolder(site, libraryTitle, folderName);
   }
 };
+
+export const addFileToFolder = async (
+  site: string,
+  folderServerRelativePath: string,
+  fileName: string,
+  content: Buffer
+) => {
+  const web = Web(site);
+
+  const fileAddResult = await web
+    .getFolderByServerRelativeUrl(folderServerRelativePath)
+    .files.add(fileName, content, false);
+
+  console.log("File add result", fileAddResult);
+};

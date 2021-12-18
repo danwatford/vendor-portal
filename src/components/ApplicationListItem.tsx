@@ -67,7 +67,9 @@ const applicationPitchDescriptionComponents = (
   const retArray = [];
 
   retArray.push(
-    <span className="block">{pitchDescriptions[application.pitchType]}</span>
+    <span className="block" key={retArray.length}>
+      {pitchDescriptions[application.pitchType]}
+    </span>
   );
 
   if (
@@ -75,39 +77,55 @@ const applicationPitchDescriptionComponents = (
     application.pitchType === "extraLargeNoShelter"
   ) {
     retArray.push(
-      <span className="block">
+      <span className="block" key={retArray.length}>
         Additional width (metres): {application.pitchAdditionalWidth}
       </span>
     );
   }
 
   if (application.pitchType === "extraLargeNoShelter") {
-    retArray.push(<span className="block">Space for van required</span>);
+    retArray.push(
+      <span className="block" key={retArray.length}>
+        Space for van required
+      </span>
+    );
   }
 
   if (application.campingRequired) {
-    retArray.push(<span className="block">Camping (max 2 persons)</span>);
+    retArray.push(
+      <span className="block" key={retArray.length}>
+        Camping (max 2 persons)
+      </span>
+    );
   }
 
   if (application.pitchElectricalOptions !== "none") {
     retArray.push(
-      <span className="block">{application.pitchElectricalOptions}</span>
+      <span className="block" key={retArray.length}>
+        {application.pitchElectricalOptions}
+      </span>
     );
   }
 
   if (application.tables) {
-    retArray.push(<span className="block">{application.tables} table(s)</span>);
+    retArray.push(
+      <span className="block" key={retArray.length}>
+        {application.tables} table(s)
+      </span>
+    );
   }
 
   if (isSubmittedCraftFairApplication(application)) {
     if (application.depositAmount) {
       retArray.push(
-        <span className="block">Deposit due: £{application.depositAmount}</span>
+        <span className="block" key={retArray.length}>
+          Deposit due: £{application.depositAmount}
+        </span>
       );
     }
     if (application.depositAmountPaid) {
       retArray.push(
-        <span className="block">
+        <span className="block" key={retArray.length}>
           Deposit paid: £{application.depositAmountPaid}
         </span>
       );

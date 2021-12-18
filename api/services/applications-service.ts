@@ -8,6 +8,7 @@ import { User } from "../interfaces/user";
 import { PersistedOrder } from "../interfaces/woocommerce";
 import { getTotalCraftFairApplicationCost } from "./applications-pricing";
 import {
+  addFileToApplication,
   createCraftApplicationListItem,
   deleteCraftApplicationListItem,
   getCraftApplicationById,
@@ -144,6 +145,24 @@ export const depositOrderUpdatedForApplication = async (
   const application = await getCraftApplicationById(id);
   if (application) {
     progressApplication(application, { depositOrder: order });
+  }
+};
+
+type FileDetails = {
+  filename: string;
+  bufferFile: Buffer;
+};
+
+export const uploadFiles = async (
+  id: number,
+  user: User,
+  files: FileDetails[]
+) => {
+  const application = await getCraftApplicationByIdAndUserId(id, user.userId);
+  if (application) {
+    for (const { filename, bufferFile } of files) {
+      await addFileToApplication(application, filename, bufferFile);
+    }
   }
 };
 
