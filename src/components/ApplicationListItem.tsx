@@ -355,7 +355,7 @@ const ApplicationListItem = <T extends EitherApplication>({
         <div className="flex-auto p-4">
           <ApplicationInfo application={application} />
         </div>
-        <div className="py-4 pr-2 w-32">{controlsComponent}</div>
+        <div className="py-4 pr-2 w-40">{controlsComponent}</div>
       </div>
     </div>
   );
