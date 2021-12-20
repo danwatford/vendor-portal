@@ -1,14 +1,14 @@
 import { PropsWithChildren, useCallback, useState } from "react";
-import { DateTime } from "luxon";
 import {
   isDraftCraftFairApplication,
   isSubmittedCraftFairApplication,
   DraftCraftFairApplication,
   SubmittedCraftFairApplication,
-  PitchType,
 } from "../interfaces/Applications";
 import { openApplicationPaymentUrl } from "../services/ApplicationsManager";
 import Spinner from "./Spinner";
+import ApplicationListItemControls from "./ApplicationListItemControls";
+import ApplicationListItemInfo from "./ApplicationListItemInfo";
 
 type EitherApplication =
   | DraftCraftFairApplication
@@ -21,16 +21,9 @@ type ConditionalApplication<T extends EitherApplication> =
 
 export interface ApplicationListItemProps<T extends EitherApplication> {
   application: ConditionalApplication<T>;
-  clickHandler: (application: ConditionalApplication<T>) => void;
-  deleteHandler: (application: ConditionalApplication<T>) => Promise<void>;
-  uploadHandler: (application: ConditionalApplication<T>) => void;
-}
-
-interface ApplicationControlsProps<T extends EitherApplication> {
-  application: ConditionalApplication<T>;
-  deleteClickedHander: React.MouseEventHandler<HTMLButtonElement>;
-  payClickedHandler: React.MouseEventHandler<HTMLButtonElement>;
-  uploadClickedHandler: React.MouseEventHandler<HTMLButtonElement>;
+  editApplication: (application: ConditionalApplication<T>) => void;
+  deleteApplication: (application: ConditionalApplication<T>) => Promise<void>;
+  uploadApplicationDocuments: (application: ConditionalApplication<T>) => void;
 }
 
 const ApplicationHeader = <T extends EitherApplication>({
@@ -54,225 +47,35 @@ const ApplicationHeader = <T extends EitherApplication>({
   );
 };
 
-const pitchDescriptions: Readonly<Record<PitchType, string>> = {
-  standardNoShelter: "Standard 3m wide x 3m deep pitch / No shelter",
-  extraLargeNoShelter: "Extra-large 4.5m wide x 3m deep pitch / No shelter",
-  standardInMarquee: "Standard 3m wide x 3m deep pitch / Marquee",
-  doubleInMarquee: "Double Width 6m wide x 3m deep pitch / Marquee",
-};
-
-const applicationPitchDescriptionComponents = (
-  application: EitherApplication
-) => {
-  const retArray = [];
-
-  retArray.push(
-    <span className="block" key={retArray.length}>
-      {pitchDescriptions[application.pitchType]}
-    </span>
-  );
-
-  if (
-    application.pitchType === "standardNoShelter" ||
-    application.pitchType === "extraLargeNoShelter"
-  ) {
-    retArray.push(
-      <span className="block" key={retArray.length}>
-        Additional width (metres): {application.pitchAdditionalWidth}
-      </span>
-    );
-  }
-
-  if (application.pitchType === "extraLargeNoShelter") {
-    retArray.push(
-      <span className="block" key={retArray.length}>
-        Space for van required
-      </span>
-    );
-  }
-
-  if (application.campingRequired) {
-    retArray.push(
-      <span className="block" key={retArray.length}>
-        Camping (max 2 persons)
-      </span>
-    );
-  }
-
-  if (application.pitchElectricalOptions !== "none") {
-    retArray.push(
-      <span className="block" key={retArray.length}>
-        {application.pitchElectricalOptions}
-      </span>
-    );
-  }
-
-  if (application.tables) {
-    retArray.push(
-      <span className="block" key={retArray.length}>
-        {application.tables} table(s)
-      </span>
-    );
-  }
-
-  if (isSubmittedCraftFairApplication(application)) {
-    if (application.depositAmount) {
-      retArray.push(
-        <span className="block" key={retArray.length}>
-          Deposit due: £{application.depositAmount}
-        </span>
-      );
-    }
-    if (application.depositAmountPaid) {
-      retArray.push(
-        <span className="block" key={retArray.length}>
-          Deposit paid: £{application.depositAmountPaid}
-        </span>
-      );
-    }
-  }
-
-  return retArray;
-};
-
-const ApplicationInfo = <T extends EitherApplication>({
-  application,
-}: {
-  application: ConditionalApplication<T>;
-}) => {
-  let timestampLabel;
-  let dateTime: DateTime;
-  if (isDraftCraftFairApplication(application)) {
-    timestampLabel = "Saved";
-    dateTime = DateTime.fromISO(application.lastSaved);
-  } else {
-    const submittedApplication = application as SubmittedCraftFairApplication;
-    timestampLabel = "Submitted";
-    dateTime = DateTime.fromISO(submittedApplication.created);
-  }
-
-  const timestampComponent = (
-    <span className="text-sm">
-      {timestampLabel} {dateTime.toLocaleString(DateTime.DATETIME_MED)}
-    </span>
-  );
-
-  return (
-    <>
-      <span className="block font-bold">{application.tradingName}</span>
-      <span className="block">{timestampComponent}</span>
-      {applicationPitchDescriptionComponents(application)}
-      <span className="block font-bold">Total: £{application.totalCost}</span>
-    </>
-  );
-};
-
-const isDeletable = (application: EitherApplication): boolean => {
-  if (isSubmittedCraftFairApplication(application)) {
-    return (
-      application.status === "Submitted" ||
-      application.status === "Pending Deposit"
-    );
-  } else {
-    // Draft applications are always deletable.
-    return true;
-  }
-};
-
-const isPayable = (application: EitherApplication): boolean => {
-  if (isSubmittedCraftFairApplication(application)) {
-    return (
-      application.status === "Pending Deposit" ||
-      application.status === "Accepted Pending Payment"
-    );
-  } else {
-    // Unsubmitted applications cannot be paid for.
-    return false;
-  }
-};
-
-const isDocumentsUploadable = (application: EitherApplication): boolean => {
-  if (isSubmittedCraftFairApplication(application)) {
-    return application.status === "Pending Document Upload";
-  } else {
-    return false;
-  }
-};
-
-const ApplicationControls = <T extends EitherApplication>({
-  application,
-  deleteClickedHander,
-  payClickedHandler,
-  uploadClickedHandler,
-}: ApplicationControlsProps<T>) => {
-  const deleteComponent = isDeletable(application) ? (
-    <button
-      onClick={deleteClickedHander}
-      className="w-full py-2 self-center bg-red-400 rounded-full"
-    >
-      {" "}
-      Delete
-    </button>
-  ) : null;
-
-  const paymentComponent = isPayable(application) ? (
-    <button
-      onClick={payClickedHandler}
-      className="w-full py-2 self-center bg-green-300 rounded-full"
-    >
-      Pay now
-    </button>
-  ) : null;
-
-  const uploadComponent = isDocumentsUploadable(application) ? (
-    <button
-      onClick={uploadClickedHandler}
-      className="w-full py-2 self-center bg-green-300 rounded-full"
-    >
-      Upload Documents
-    </button>
-  ) : null;
-
-  return (
-    <>
-      <div className="flex flex-col gap-2 text-center">
-        {paymentComponent}
-        {deleteComponent}
-        {uploadComponent}
-      </div>
-    </>
-  );
-};
-
 const ApplicationListItem = <T extends EitherApplication>({
   application,
-  clickHandler,
-  deleteHandler,
-  uploadHandler,
+  editApplication,
+  deleteApplication,
+  uploadApplicationDocuments,
 }: ApplicationListItemProps<T>): JSX.Element => {
   const [processing, setProcessing] = useState(false);
 
   const itemSelectedHandler = useCallback(() => {
     if (!processing) {
-      clickHandler(application);
+      editApplication(application);
     }
-  }, [application, clickHandler, processing]);
+  }, [application, editApplication, processing]);
 
-  const deleteClickedHandler: React.MouseEventHandler<HTMLButtonElement> =
+  const deleteButtonClickedHandler: React.MouseEventHandler<HTMLButtonElement> =
     useCallback(
       (ev) => {
         // Stop event propagation since we also have a click handler on the whole ApplicationListItem component.
         ev.stopPropagation();
 
         setProcessing(true);
-        deleteHandler(application).finally(() => {
+        deleteApplication(application).finally(() => {
           setProcessing(false);
         });
       },
-      [application, deleteHandler]
+      [application, deleteApplication]
     );
 
-  const payClickHandler: React.MouseEventHandler<HTMLButtonElement> =
+  const payButtonClickedHandler: React.MouseEventHandler<HTMLButtonElement> =
     useCallback(
       (ev) => {
         // Stop event propagation since we also have a click handler on the whole ApplicationListItem component.
@@ -288,7 +91,7 @@ const ApplicationListItem = <T extends EitherApplication>({
       [application]
     );
 
-  const uploadClickHandler: React.MouseEventHandler<HTMLButtonElement> =
+  const uploadApplicationDocumentsClickedHandler: React.MouseEventHandler<HTMLButtonElement> =
     useCallback(
       (ev) => {
         // Stop event propagation since we also have a click handler on the whole ApplicationListItem component.
@@ -296,11 +99,11 @@ const ApplicationListItem = <T extends EitherApplication>({
 
         if (isSubmittedCraftFairApplication(application)) {
           setProcessing(true);
-          uploadHandler(application);
+          uploadApplicationDocuments(application);
           setProcessing(false);
         }
       },
-      [application, uploadHandler]
+      [application, uploadApplicationDocuments]
     );
 
   let controlsComponent;
@@ -309,11 +112,13 @@ const ApplicationListItem = <T extends EitherApplication>({
   } else {
     controlsComponent = (
       <div className="text-center">
-        <ApplicationControls
+        <ApplicationListItemControls
           application={application}
-          deleteClickedHander={deleteClickedHandler}
-          payClickedHandler={payClickHandler}
-          uploadClickedHandler={uploadClickHandler}
+          deleteButtonClickedHander={deleteButtonClickedHandler}
+          payButtonClickedHandler={payButtonClickedHandler}
+          uploadDocumentsButtonClickedHandler={
+            uploadApplicationDocumentsClickedHandler
+          }
         />
       </div>
     );
@@ -340,7 +145,7 @@ const ApplicationListItem = <T extends EitherApplication>({
       actionRequiredComponent = (
         <div>
           ACTION Required:
-          <button onClick={payClickHandler} className="mx-1 underline">
+          <button onClick={payButtonClickedHandler} className="mx-1 underline">
             Deposit payment
           </button>
           <br></br>
@@ -352,7 +157,10 @@ const ApplicationListItem = <T extends EitherApplication>({
       actionRequiredComponent = (
         <div>
           ACTION Required:{" "}
-          <button onClick={uploadClickHandler} className="underline">
+          <button
+            onClick={uploadApplicationDocumentsClickedHandler}
+            className="underline"
+          >
             Upload supporting documents/images.
           </button>{" "}
           for your application
@@ -371,7 +179,7 @@ const ApplicationListItem = <T extends EitherApplication>({
       </ApplicationHeader>
       <div className="flex flex-row">
         <div className="flex-auto p-4">
-          <ApplicationInfo application={application} />
+          <ApplicationListItemInfo application={application} />
         </div>
         <div className="py-4 pr-2 w-40">{controlsComponent}</div>
       </div>

@@ -44,9 +44,9 @@ const SubmittedApplicationsList: React.FC = () => {
       <ApplicationListItem
         key={index}
         application={application}
-        clickHandler={() => clickHandler(application)}
-        deleteHandler={() => deleteApplication(application)}
-        uploadHandler={() => uploadClickedHandler(application)}
+        editApplication={() => clickHandler(application)}
+        deleteApplication={() => deleteApplication(application)}
+        uploadApplicationDocuments={() => uploadClickedHandler(application)}
       />
     ));
   }

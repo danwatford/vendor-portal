@@ -41,9 +41,9 @@ const DraftApplicationsList: React.FC = () => {
       <ApplicationListItem
         key={index}
         application={application}
-        clickHandler={() => clickHandler(index)}
-        deleteHandler={() => deleteClickHandler(index)}
-        uploadHandler={() => {}}
+        editApplication={() => clickHandler(index)}
+        deleteApplication={() => deleteClickHandler(index)}
+        uploadApplicationDocuments={() => {}}
       />
     ));
   }
