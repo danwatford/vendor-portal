@@ -44,6 +44,7 @@ const DraftApplicationsList: React.FC = () => {
         editApplication={() => clickHandler(index)}
         deleteApplication={() => deleteClickHandler(index)}
         uploadApplicationDocuments={() => {}}
+        completeApplication={async () => {}}
       />
     ));
   }

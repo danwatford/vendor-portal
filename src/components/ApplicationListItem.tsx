@@ -24,6 +24,9 @@ export interface ApplicationListItemProps<T extends EitherApplication> {
   editApplication: (application: ConditionalApplication<T>) => void;
   deleteApplication: (application: ConditionalApplication<T>) => Promise<void>;
   uploadApplicationDocuments: (application: ConditionalApplication<T>) => void;
+  completeApplication: (
+    application: ConditionalApplication<T>
+  ) => Promise<void>;
 }
 
 const ApplicationHeader = <T extends EitherApplication>({
@@ -52,6 +55,7 @@ const ApplicationListItem = <T extends EitherApplication>({
   editApplication,
   deleteApplication,
   uploadApplicationDocuments,
+  completeApplication,
 }: ApplicationListItemProps<T>): JSX.Element => {
   const [processing, setProcessing] = useState(false);
 
@@ -117,6 +121,21 @@ const ApplicationListItem = <T extends EitherApplication>({
       [application, uploadApplicationDocuments]
     );
 
+  const applicationCompleteClickedHandler: React.MouseEventHandler<HTMLButtonElement> =
+    useCallback(
+      async (ev) => {
+        // Stop event propagation since we also have a click handler on the whole ApplicationListItem component.
+        ev.stopPropagation();
+
+        if (isSubmittedCraftFairApplication(application)) {
+          setProcessing(true);
+          await completeApplication(application);
+          setProcessing(false);
+        }
+      },
+      [application, completeApplication]
+    );
+
   let controlsComponent;
   if (processing) {
     controlsComponent = <Spinner size="sm" />;
@@ -131,6 +150,7 @@ const ApplicationListItem = <T extends EitherApplication>({
           uploadDocumentsButtonClicked={
             uploadApplicationDocumentsClickedHandler
           }
+          applicationCompleteButtonClcked={applicationCompleteClickedHandler}
         />
       </div>
     );
@@ -168,14 +188,26 @@ const ApplicationListItem = <T extends EitherApplication>({
     } else if (application.status === "Pending Document Upload") {
       actionRequiredComponent = (
         <div>
-          ACTION Required:{" "}
-          <button
-            onClick={uploadApplicationDocumentsClickedHandler}
-            className="underline"
-          >
-            Upload supporting documents/images.
-          </button>{" "}
-          for your application
+          <div>
+            ACTION Required:{" "}
+            <button
+              onClick={uploadApplicationDocumentsClickedHandler}
+              className="underline"
+            >
+              Upload supporting documents/images.
+            </button>{" "}
+            for your application.
+          </div>
+          <div>
+            If you have already uploaded all required document, mark your{" "}
+            <button
+              onClick={uploadApplicationDocumentsClickedHandler}
+              className="underline"
+            >
+              Application as Complete
+            </button>{" "}
+            so that Broadstairs Folk Week can process it.
+          </div>
         </div>
       );
     }

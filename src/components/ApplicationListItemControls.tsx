@@ -19,6 +19,7 @@ interface ApplicationControlsProps<T extends EitherApplication> {
   deleteButtonClicked: React.MouseEventHandler<HTMLButtonElement>;
   payButtonClicked: React.MouseEventHandler<HTMLButtonElement>;
   uploadDocumentsButtonClicked: React.MouseEventHandler<HTMLButtonElement>;
+  applicationCompleteButtonClcked: React.MouseEventHandler<HTMLButtonElement>;
 }
 
 const isEditable = (application: EitherApplication): boolean => {
@@ -66,6 +67,14 @@ const isDocumentsUploadable = (application: EitherApplication): boolean => {
   }
 };
 
+const isCompletable = (application: EitherApplication): boolean => {
+  if (isSubmittedCraftFairApplication(application)) {
+    return application.status === "Pending Document Upload";
+  } else {
+    return false;
+  }
+};
+
 interface ControlsButtonProps {
   text: string;
   className: string;
@@ -92,6 +101,7 @@ const ApplicationListItemControls = <T extends EitherApplication>({
   deleteButtonClicked,
   payButtonClicked,
   uploadDocumentsButtonClicked,
+  applicationCompleteButtonClcked,
 }: ApplicationControlsProps<T>) => {
   const editComponent = isEditable(application) ? (
     <ControlsButton
@@ -110,21 +120,27 @@ const ApplicationListItemControls = <T extends EitherApplication>({
   ) : null;
 
   const paymentComponent = isPayable(application) ? (
-    <button
-      onClick={payButtonClicked}
-      className="w-full py-2 self-center bg-green-300 rounded-full"
-    >
-      Pay now
-    </button>
+    <ControlsButton
+      text="Pay Now"
+      className="bg-green-300"
+      buttonClickedHander={payButtonClicked}
+    />
   ) : null;
 
   const uploadComponent = isDocumentsUploadable(application) ? (
-    <button
-      onClick={uploadDocumentsButtonClicked}
-      className="w-full py-2 self-center bg-green-300 rounded-full"
-    >
-      Upload Documents
-    </button>
+    <ControlsButton
+      text="Upload Documents"
+      className="bg-green-400"
+      buttonClickedHander={uploadDocumentsButtonClicked}
+    />
+  ) : null;
+
+  const completeComponent = isCompletable(application) ? (
+    <ControlsButton
+      text="Application Complete"
+      className="bg-blue-300"
+      buttonClickedHander={applicationCompleteButtonClcked}
+    />
   ) : null;
 
   return (
@@ -134,6 +150,7 @@ const ApplicationListItemControls = <T extends EitherApplication>({
         {paymentComponent}
         {deleteComponent}
         {uploadComponent}
+        {completeComponent}
       </div>
     </>
   );

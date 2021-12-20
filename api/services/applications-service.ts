@@ -17,7 +17,10 @@ import {
   updateCraftApplicationListItem,
 } from "./applications-sp";
 import { deleteDepositOrder } from "./applications-woocommerce";
-import { progressApplication } from "./applications-workflow";
+import {
+  progressApplication,
+  transitionToStatus,
+} from "./applications-workflow";
 import { getVendorPortalConfig } from "./configuration-service";
 
 const config = getVendorPortalConfig();
@@ -98,6 +101,37 @@ export const deleteApplication = async (
     }
   } else {
     return fail("APPLICATION_NOT_FOUND");
+  }
+};
+
+export const applicationComplete = async (
+  dbId: number,
+  user: User
+): Promise<
+  OrError<
+    PersistedCraftFairApplication,
+    "APPLICATION_NOT_FOUND" | "APPLICATION_CONFLICT"
+  >
+> => {
+  const application = await getCraftApplication(dbId, user.userId);
+
+  if (application) {
+    // Applications can only be marked as completed if currently pending uploading of documents.
+    if (application.status === "Pending Document Upload") {
+      const updatedApplication = await transitionToStatus(
+        application,
+        {},
+        "Processing"
+      );
+      return success(updatedApplication);
+    } else {
+      return error(
+        "APPLICATION_CONFLICT",
+        "Cannot complete applications which are have status other than 'Pending Document Upload'"
+      );
+    }
+  } else {
+    return error("APPLICATION_NOT_FOUND");
   }
 };
 

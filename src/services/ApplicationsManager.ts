@@ -137,6 +137,40 @@ export const deleteApplication = async (
   notifyApplicationListChangeSubscribers();
 };
 
+export const completeApplication = async (
+  application: SubmittedCraftFairApplication
+) => {
+  const completeUrl = new URL(
+    "/api/applicationComplete",
+    document.location.href
+  );
+  completeUrl.searchParams.append("dbId", "" + application.dbId);
+
+  try {
+    const res = await fetch(completeUrl.href);
+    if (res.status === 200) {
+      const json = await res.json();
+      const completedApplication =
+        SubmittedCraftFairApplicationRunType.check(json);
+
+      const updateIndex = applications.findIndex(
+        (a) => a.dbId === completedApplication.dbId
+      );
+      if (updateIndex >= 0) {
+        applications[updateIndex] = completedApplication;
+        notifyApplicationListChangeSubscribers();
+      } else {
+        refreshApplicationsList();
+      }
+    }
+  } catch (err: any) {
+    applicationsError = "Error completing application on server";
+    console.error("Error completing application", err);
+  }
+
+  notifyApplicationListChangeSubscribers();
+};
+
 export const openApplicationPaymentUrl = async (
   application: SubmittedCraftFairApplication
 ) => {

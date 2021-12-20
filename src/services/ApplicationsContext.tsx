@@ -7,6 +7,7 @@ import {
   refreshApplicationsList,
   subscribeApplicationListChange,
   deleteApplication as managerDeleteApplication,
+  completeApplication as managerCompleteApplication,
 } from "./ApplicationsManager";
 import { useUserProfile } from "./UserProfileContext";
 
@@ -19,6 +20,9 @@ export type IApplicationsContext = {
   clearCurrentApplication: () => void;
   refreshApplications: () => Promise<void>;
   deleteApplication: (
+    application: SubmittedCraftFairApplication
+  ) => Promise<void>;
+  completeApplication: (
     application: SubmittedCraftFairApplication
   ) => Promise<void>;
 };
@@ -37,6 +41,7 @@ const ApplicationsContext = React.createContext<IApplicationsContext>({
   clearCurrentApplication: invalidFunction,
   refreshApplications: invalidFunction,
   deleteApplication: invalidFunction,
+  completeApplication: invalidFunction,
 });
 
 const ApplicationsContextProvider = ({
@@ -60,6 +65,13 @@ const ApplicationsContextProvider = ({
   const deleteApplication = useCallback(
     async (application: SubmittedCraftFairApplication) => {
       await managerDeleteApplication(application);
+    },
+    []
+  );
+
+  const completeApplication = useCallback(
+    async (application: SubmittedCraftFairApplication) => {
+      await managerCompleteApplication(application);
     },
     []
   );
@@ -93,6 +105,7 @@ const ApplicationsContextProvider = ({
         },
         refreshApplications: fetchApplications,
         deleteApplication,
+        completeApplication,
       }}
     >
       {children}

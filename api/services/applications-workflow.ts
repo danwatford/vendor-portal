@@ -121,7 +121,7 @@ const progressApplicationForStatusPendingDeposit = async (
   return application;
 };
 
-const transitionToStatus = async (
+export const transitionToStatus = async (
   application: PersistedCraftFairApplication,
   context: ProgressApplicationContext,
   toStatus: ApplicationStatus
@@ -138,6 +138,10 @@ const transitionToStatus = async (
         application
       );
       application.status = "Pending Document Upload";
+      return updateCraftApplicationListItem(application);
+
+    case "Processing":
+      application.status = "Processing";
       return updateCraftApplicationListItem(application);
   }
   return application;

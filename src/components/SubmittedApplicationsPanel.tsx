@@ -11,6 +11,7 @@ const SubmittedApplicationsList: React.FC = () => {
     applications,
     error,
     deleteApplication,
+    completeApplication,
     setCurrentApplication,
   } = useApplications();
   const navigate = useNavigate();
@@ -47,6 +48,7 @@ const SubmittedApplicationsList: React.FC = () => {
         editApplication={() => clickHandler(application)}
         deleteApplication={() => deleteApplication(application)}
         uploadApplicationDocuments={() => uploadClickedHandler(application)}
+        completeApplication={() => completeApplication(application)}
       />
     ));
   }
