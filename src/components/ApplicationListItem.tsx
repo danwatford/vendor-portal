@@ -61,6 +61,17 @@ const ApplicationListItem = <T extends EitherApplication>({
     }
   }, [application, editApplication, processing]);
 
+  const editButtonClickedHandler: React.MouseEventHandler<HTMLButtonElement> =
+    useCallback(
+      (ev) => {
+        // Stop event propagation since we also have a click handler on the whole ApplicationListItem component.
+        ev.stopPropagation();
+
+        editApplication(application);
+      },
+      [application, editApplication]
+    );
+
   const deleteButtonClickedHandler: React.MouseEventHandler<HTMLButtonElement> =
     useCallback(
       (ev) => {
@@ -114,9 +125,10 @@ const ApplicationListItem = <T extends EitherApplication>({
       <div className="text-center">
         <ApplicationListItemControls
           application={application}
-          deleteButtonClickedHander={deleteButtonClickedHandler}
-          payButtonClickedHandler={payButtonClickedHandler}
-          uploadDocumentsButtonClickedHandler={
+          editButtonClicked={editButtonClickedHandler}
+          deleteButtonClicked={deleteButtonClickedHandler}
+          payButtonClicked={payButtonClickedHandler}
+          uploadDocumentsButtonClicked={
             uploadApplicationDocumentsClickedHandler
           }
         />
