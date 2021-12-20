@@ -136,6 +136,12 @@ const ApplicationListItem = <T extends EitherApplication>({
       [application, completeApplication]
     );
 
+  const editItemEnabled =
+    isSubmittedCraftFairApplication(application) &&
+    (application.status === "Submitted" ||
+      application.status === "Pending Deposit" ||
+      application.status === "Pending Document Upload");
+
   let controlsComponent;
   if (processing) {
     controlsComponent = <Spinner size="sm" />;
@@ -215,8 +221,14 @@ const ApplicationListItem = <T extends EitherApplication>({
 
   return (
     <div
-      onClick={() => itemSelectedHandler()}
-      className="flex flex-col -mb-4 pb-4 even:ml-2 odd:mr-2 even:bg-yellow-50 odd:bg-yellow-100 hover:bg-yellow-200 rounded-lg overflow-hidden cursor-pointer"
+      onClick={() => {
+        if (editItemEnabled) {
+          itemSelectedHandler();
+        }
+      }}
+      className={`flex flex-col -mb-4 pb-4 even:ml-2 odd:mr-2 even:bg-yellow-50 odd:bg-yellow-100 hover:bg-yellow-200 rounded-lg overflow-hidden ${
+        editItemEnabled ? "cursor-pointer" : ""
+      }`}
     >
       <ApplicationHeader application={application}>
         {actionRequiredComponent}
