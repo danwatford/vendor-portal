@@ -1,97 +1,15 @@
 import "dotenv/config";
 import "isomorphic-fetch";
 import { Client } from "@microsoft/microsoft-graph-client";
-import { ColumnDefinition, List } from "@microsoft/microsoft-graph-types";
 
 import { TokenCredentialAuthenticationProvider } from "@microsoft/microsoft-graph-client/authProviders/azureTokenCredentials";
 import { ClientSecretCredential } from "@azure/identity";
+import { List } from "@microsoft/microsoft-graph-types";
 
 import validateEnv from "./utils/validateEnv";
+import lists from "./list-info";
 
 validateEnv();
-
-const applicationColumns: ColumnDefinition[] = [
-  {
-    name: "Status",
-    indexed: true,
-    required: true,
-    choice: {
-      allowTextEntry: false,
-      displayAs: "dropDownMenu",
-      choices: [
-        "Submitted",
-        "Pending Deposit",
-        "Pending Document Upload",
-        "Processing",
-        "Rejected",
-        "Accepted Pending Payment",
-        "Accepted",
-      ],
-    },
-    defaultValue: {
-      value: "Submitted",
-    },
-  },
-  {
-    name: "TotalCost",
-    displayName: "Total cost",
-    indexed: true,
-    required: true,
-    currency: {
-      locale: "en-gb",
-    },
-  },
-  {
-    name: "DescriptionOfStall",
-    displayName: "Description of stall",
-    text: {
-      allowMultipleLines: true,
-      linesForEditing: 3,
-    },
-  },
-  {
-    name: "AddressLine1",
-    displayName: "Address line 1",
-    text: {},
-  },
-  {
-    name: "AddressLine2",
-    displayName: "Address line 2",
-    text: {},
-  },
-  {
-    name: "City",
-    text: {},
-  },
-  {
-    name: "State",
-    text: {},
-  },
-  {
-    name: "Postcode",
-    text: {},
-  },
-  {
-    name: "Country",
-    text: {},
-  },
-  {
-    name: "ContactFirstName",
-    displayName: "Contact first name",
-    text: {},
-  },
-  {
-    name: "ContactLastName",
-    displayName: "Contact last name",
-    text: {},
-  },
-];
-
-const applicationsList: List = {
-  displayName: "Applications",
-  description: "List of applications for catering and craft fair pitches",
-  columns: applicationColumns,
-};
 
 const credential = new ClientSecretCredential(
   process.env["TENANT_ID"],
@@ -107,7 +25,7 @@ const client = Client.initWithMiddleware({
   authProvider,
 });
 
-async function createList() {
+async function createList(applicationsList: List) {
   try {
     const siteRequest = await client
       .api(
@@ -127,7 +45,7 @@ async function createList() {
         .get();
 
       const listBaseApi: string = siteBaseApi + "/lists/" + existingList.id;
-      const existingColumns: ColumnDefinition[] = existingList.columns;
+      const existingColumns: List["columns"] = existingList.columns;
       for (const fieldDef of applicationsList.columns) {
         const existingColumn = existingColumns.find(
           (existingColumn) => existingColumn.name === fieldDef.name
@@ -160,4 +78,10 @@ async function createList() {
   }
 }
 
-createList();
+async function createLists() {
+  for (const list of lists) {
+    await createList(list);
+  }
+}
+
+createLists();
