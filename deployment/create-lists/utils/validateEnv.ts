@@ -1,11 +1,12 @@
-import { cleanEnv, str, url } from "envalid";
+import { cleanEnv, str } from "envalid";
 
 const validateEnv = () => {
   cleanEnv(process.env, {
     TENANT_ID: str(),
     CLIENT_ID: str(),
     CLIENT_SECRET: str(),
-    SITE_URL: url(),
+    TENANT_NAME: str(),
+    SITE_PATH: str(),
   });
 };
 

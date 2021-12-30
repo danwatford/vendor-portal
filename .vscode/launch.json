@@ -2,6 +2,14 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "type": "pwa-node",
+      "request": "launch",
+      "name": "Debug create-lists",
+      "skipFiles": ["<node_internals>/**"],
+      "program": "${workspaceFolder}/deployment/create-lists/dist/index.js",
+      "cwd": "${workspaceFolder}/deployment/create-lists"
+    },
+    {
       "command": "swa start http://localhost:3000 --api-location http://localhost:7071",
       "name": "Run emulator",
       "request": "launch",

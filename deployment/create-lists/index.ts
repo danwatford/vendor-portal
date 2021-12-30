@@ -110,7 +110,9 @@ const client = Client.initWithMiddleware({
 async function createList() {
   try {
     const siteRequest = await client
-      .api("/sites/watconsdev.sharepoint.com:/sites/bfwvendors")
+      .api(
+        `/sites/${process.env["TENANT_NAME"]}.sharepoint.com:${process.env["SITE_PATH"]}`
+      )
       .get();
     const siteBaseApi: string = "sites/" + siteRequest.id;
 
