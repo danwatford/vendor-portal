@@ -21,7 +21,7 @@ const authProvider = new TokenCredentialAuthenticationProvider(credential, {
 });
 
 const client = Client.initWithMiddleware({
-  debugLogging: false,
+  debugLogging: true,
   authProvider,
 });
 

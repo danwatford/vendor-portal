@@ -75,6 +75,117 @@ const applicationColumns: ColumnDefinition[] = [
     displayName: "Contact last name",
     text: {},
   },
+  {
+    name: "ContactEmail",
+    displayName: "Contact email",
+    indexed: true,
+    required: true,
+    text: {},
+  },
+  {
+    name: "Landline",
+    text: {},
+  },
+  {
+    name: "Mobile",
+    text: {},
+  },
+  {
+    name: "Website",
+    hyperlinkOrPicture: { isPicture: false },
+  },
+  { name: "UserId", indexed: true, required: true, text: {} },
+  {
+    name: "PitchType",
+    displayName: "Pitch type",
+    indexed: true,
+    required: true,
+    choice: {
+      allowTextEntry: false,
+      choices: [
+        "standardNoShelter",
+        "extraLargeNoShelter",
+        "standardInMarquee",
+        "doubleInMarquee",
+      ],
+    },
+  },
+  {
+    name: "PitchAdditionalWidth",
+    displayName: "Pitch additional width",
+    number: {},
+  },
+  {
+    name: "PitchVanSpaceRequired",
+    displayName: "Pitch van space required",
+    indexed: true,
+    boolean: {},
+    defaultValue: { value: "No" },
+  },
+  {
+    name: "PitchElectricalOptions",
+    displayName: "Pitch electrical options",
+    indexed: true,
+    choice: {
+      allowTextEntry: false,
+      choices: [
+        "none",
+        "1 x 13amp socket",
+        "1 x 16amp socket",
+        "2 x 13amp socket",
+        "1 x 32amp supply",
+      ],
+    },
+    defaultValue: { value: "none" },
+  },
+  {
+    name: "CampingRequired",
+    displayName: "Camping required",
+    boolean: {},
+    defaultValue: { value: "No" },
+  },
+  {
+    name: "Tables",
+    number: {},
+  },
+  {
+    name: "DepositOrderNumber",
+    displayName: "Deposit order number",
+    indexed: true,
+    number: {},
+  },
+  {
+    name: "DepositOrderKey",
+    displayName: "Deposit order key",
+    indexed: true,
+    text: {},
+  },
+  {
+    name: "DepositAmount",
+    displayName: "Deposit amount",
+    currency: {
+      locale: "en-gb",
+    },
+  },
+  {
+    name: "DepositAmountPaid",
+    displayName: "Deposit Amount Paid",
+    currency: {
+      locale: "en-gb",
+    },
+  },
+  {
+    name: "Total Paid",
+    displayName: "Total Paid",
+    currency: {
+      locale: "en-gb",
+    },
+  },
+  {
+    name: "DocumentFolder",
+    displayName: "Document Folder",
+    hyperlinkOrPicture: { isPicture: false },
+  },
 ];
 
 const applicationsList: List = {
